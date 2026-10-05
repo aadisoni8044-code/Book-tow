@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Browser</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <div id="app-container">
+    <!-- Top Navigation Bar -->
+    <header id="nav-bar">
+      <div class="nav-group">
+        <button id="btn-back" class="nav-btn" title="Back" disabled>
+          <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        </button>
+        <button id="btn-forward" class="nav-btn" title="Forward" disabled>
+          <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </button>
+        <button id="btn-reload" class="nav-btn" title="Reload">
+          <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+        <button id="btn-home" class="nav-btn" title="Home">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+      </div>
+
+      <!-- Address / Search Bar -->
+      <div id="address-bar-container">
+        <div id="security-badge" class="security-badge">
+          <svg id="security-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </div>
+        <input type="text" id="address-input" placeholder="Search with DuckDuckGo or enter web address" autocomplete="off" spellcheck="false" />
+        <span id="search-indicator" class="search-type-indicator">Search</span>
+      </div>
+
+      <div class="nav-group">
+        <!-- Privacy Indicator Shield Button -->
+        <button id="btn-shield" class="shield-btn" title="Privacy Information">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+          <span>Temporary</span>
+        </button>
+
+        <!-- Three-dot Menu Button -->
+        <button id="btn-menu" class="nav-btn" title="Menu">
+          <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Browser Content Viewport -->
+    <main id="browser-viewport">
+      <webview id="web-view" src="home.html" allowpopups webpreferences="allowRunningInsecureContent=no"></webview>
+    </main>
+
+    <!-- Privacy Shield Popover Panel -->
+    <div id="privacy-panel" class="popover-panel">
+      <div class="panel-header">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        <span class="panel-title">Privacy Protection</span>
+      </div>
+      <div class="privacy-list">
+        <div class="privacy-item">
+          <span class="privacy-item-label">Browsing Session</span>
+          <span class="privacy-item-value">Temporary</span>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-item-label">Cookies</span>
+          <span class="privacy-item-value">Temporary</span>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-item-label">Browsing History</span>
+          <span class="privacy-item-value">Not saved</span>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-item-label">Cache</span>
+          <span class="privacy-item-value">Temporary</span>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-item-label">Local Storage</span>
+          <span class="privacy-item-value">Temporary</span>
+        </div>
+        <div class="privacy-item">
+          <span class="privacy-item-label">Session Data</span>
+          <span class="privacy-item-value">Cleared on exit</span>
+        </div>
+      </div>
+      <div class="privacy-footer-note">
+        Your local browsing session is temporary. All session data is destroyed when Private Browser is closed.
+      </div>
+    </div>
+
+    <!-- Three-dot Menu Popover Panel -->
+    <div id="menu-panel" class="popover-panel">
+      <button id="menu-new-tab" class="menu-item">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <span>New Private Session</span>
+      </button>
+      <button id="menu-clear-now" class="menu-item">
+        <svg viewBox="0 0 24 24"><path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12z"/></svg>
+        <span>Clear Session Data Now</span>
+      </button>
+      <button id="menu-settings" class="menu-item">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/></svg>
+        <span>Settings</span>
+      </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <span class="modal-title">Settings</span>
+          <button id="btn-close-settings" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <!-- Privacy Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Privacy</div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Temporary Browsing Session</span>
+                <span class="setting-desc">Session state is strictly isolated from disk persistence</span>
+              </div>
+              <span class="badge-locked">ON (Locked)</span>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Clear Data on Exit</span>
+                <span class="setting-desc">Automatically purge cookies, storage, and cache when closed</span>
+              </div>
+              <span class="badge-locked">ON (Locked)</span>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Save Browsing History</span>
+                <span class="setting-desc">Store visited URLs across sessions</span>
+              </div>
+              <span class="badge-locked">OFF (Locked)</span>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Persistent Cookies</span>
+                <span class="setting-desc">Keep cookies after application exits</span>
+              </div>
+              <span class="badge-locked">OFF (Locked)</span>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Persistent Cache</span>
+                <span class="setting-desc">Keep disk cache between sessions</span>
+              </div>
+              <span class="badge-locked">OFF (Locked)</span>
+            </div>
+          </div>
+
+          <!-- Appearance Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Theme Mode</span>
+                <span class="setting-desc">Choose visual theme interface</span>
+              </div>
+              <div class="setting-control">
+                <select id="setting-theme">
+                  <option value="system">System Mode</option>
+                  <option value="dark">Dark Mode</option>
+                  <option value="light">Light Mode</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- General Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">General</div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Search Engine</span>
+                <span class="setting-desc">Default engine used for address bar searches</span>
+              </div>
+              <div class="setting-control">
+                <select id="setting-search-engine">
+                  <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+                  <option value="https://www.startpage.com/sp/search?query=">Startpage</option>
+                  <option value="https://html.duckduckgo.com/html/?q=">DuckDuckGo HTML</option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Startup Behavior</span>
+                <span class="setting-desc">Always start with a fresh temporary session</span>
+              </div>
+              <span class="badge-locked">Fresh Temporary Session</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
