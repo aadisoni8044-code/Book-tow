@@ -1,0 +1,57 @@
+Subject: How run works in Jps script — Simple 2D Game LogicHi everyone,I am building a custom, highly simplified 2D programming language called Jps script. The core focus of Jps script is to let anyone create 2D games with just a few lines of code without writing complex boilerplate game loops.Here is how the dynamic movement system (run) works in Jps script:1. Default State (Static Object)If you define an object without calling the run method, the object remains static (it stays fixed at its position).Plaintextimport.box[cite: 1]
+
+a = body_2D.box()[cite: 1]
+b = size.box(500,500)[cite: 1]
+# Note: run.box() is NOT called here[cite: 1]
+Behavior: The 2D Box will spawn on the screen, but it will remain stationary (ruka rahega).2. Active State (Automatic Movement)When you include run.box(), Jps script automatically attaches the background physics and render loop to make the object move automatically (chalne lagega).Plaintextimport.box[cite: 1]
+
+a = body_2D.box()[cite: 1]
+b = size.box(500,500)[cite: 1]
+c = run.box()[cite: 1]
+Behavior: The moment run.box() is executed, the box starts moving dynamically across the scene.Why this design?In traditional game engines, moving a box requires handling event loops, delta time, $X/Y$ velocity updates, and screen redrawing. In Jps script, 1 single function line (run.box()) handles all underlying execution loops behind the scenes!
+
+
+
+
+
+#---------------------------------------------------------------------------
+
+
+
+
+Subject: Introducing Interactive Drag-and-Drop using switch.box() in Jps scriptHi everyone,In Jps script, we aim to make 2D game interactions as effortless as possible. One of the core interactive functions in the box module is switch.box().   Here is how switch works:What does switch do?The switch function enables mouse interaction and drag-and-drop mechanics for the object.Without switch.box(), the box is just a rendered 2D element.   With switch.box(), users can click on the box using the mouse, pick it up, drag it around the screen, and place it anywhere they want.   Syntax ExamplePlaintextimport.game
+import.box[cite: 3]
+
+a = size.game(1000, 1000)[cite: 3]
+b = run.game()[cite: 3]
+c = run.box()[cite: 3]
+d = switch.box()[cite: 3]  # Enables mouse click & drag-and-drop
+
+print(a, b, c, d)[cite: 3]
+Why is this useful?In traditional game development, creating a click-and-drag mechanism requires:Detecting mouse click collision with the object bounds.Tracking mouse move events and updating coordinates every frame.Handling mouse release events to drop the object.In Jps script, writing d = switch.box()[cite: 3] handles all event-driven drag-and-drop logic under the hood automatically!
+
+
+
+
+
+
+#-----------------------------------------------------------------------------
+
+
+
+
+Hi everyone,In Jps script, we differentiate between building a basic document structure and generating a full-fledged interactive game world. This is controlled by the game library.   Here is how import.game transforms your application:   1. Without import.game (Standard Skeleton)If you do not import game, the engine treats your code as a standard static frame or basic HTML-like layout.Result: A simple visual canvas without interactive physics, game mechanics, or rich aesthetic styles.2. With import.game (Full Game Engine & Styling)When you call import.game, Jps script automatically attaches the game mechanics pipeline behind the scenes.   Plaintextimport.game
+import.box[cite: 3]
+
+a = size.game(1000,1000)[cite: 3]
+b = run.game()[cite: 3]
+c = run.box()[cite: 1, 3]
+d = switch.box()[cite: 3]
+
+print(a,b,c,d)[cite: 3]
+What import.game brings automatically:Game Mechanics: Collision boundaries, game loops, and dynamic rendering.UI & Aesthetics: High-quality visual styles (CSS/Shader properties) applied automatically to 2D elements without writing extra code.Canvas Windowing: Automatically configures window scaling, refresh rates, and input handlers.Why this architecture?Instead of forcing users to manually design UI styles with external CSS and write complex canvas rendering scripts, import.game handles both game physics and dynamic visual design in 1 single line[cite: 3]!
+
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------
