@@ -1,0 +1,30 @@
+name: zipgram
+description: "Zipgram - Premium Camera Filter App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  camera: ^0.11.1
+  share_plus: ^10.1.4
+  image: ^4.5.2
+  path_provider: ^2.1.5
+  permission_handler: ^11.4.0
+  provider: ^6.1.2
+  gal: ^2.3.0
+  shared_preferences: ^2.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
