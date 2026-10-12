@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Portal - Gravity Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-1: #0f172a;
+      --bg-gradient-2: #1e1b4b;
+      --bg-gradient-3: #020617;
+      --panel-bg: rgba(30, 41, 59, 0.85);
+      --panel-border: rgba(255, 255, 255, 0.12);
+      --panel-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(99, 102, 241, 0.15);
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-light: #818cf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --input-focus: #6366f1;
+      --handle-bg: rgba(99, 102, 241, 0.2);
+      --handle-hover: rgba(99, 102, 241, 0.4);
+      --handle-active: #6366f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 50% 20%, var(--bg-gradient-2), var(--bg-gradient-1) 50%, var(--bg-gradient-3) 100%);
+      color: var(--text-main);
+    }
+
+    /* Ambient background grid pattern */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Floating Header Controls */
+    .top-controls {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    .divider-v {
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-reset {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: rgba(99, 102, 241, 0.3);
+      border-color: rgba(99, 102, 241, 0.6);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-reset:active {
+      transform: translateY(0);
+    }
+
+    .btn-reset svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-reset:hover svg {
+      transform: rotate(-90deg);
+    }
+
+    /* Physics World Container */
+    #physics-world {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    /* Movable Login Panel Container */
+    .login-panel {
+      position: absolute;
+      width: 400px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      box-shadow: var(--panel-shadow);
+      padding: 28px 28px 24px 28px;
+      transform-origin: center center;
+      will-change: transform;
+      touch-action: none;
+      z-index: 10;
+    }
+
+    .login-panel.is-dragging {
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.3);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
+    /* Grab Handles */
+    .grab-handle {
+      position: absolute;
+      background: var(--handle-bg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      z-index: 20;
+    }
+
+    .grab-handle:hover {
+      background: var(--handle-hover);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+
+    .grab-handle:active, .is-dragging .grab-handle {
+      cursor: grabbing;
+      background: var(--handle-active);
+      border-color: var(--accent-light);
+    }
+
+    /* Top Grip Handle Bar */
+    .grab-handle-top {
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 28px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      gap: 6px;
+      padding: 0 10px;
+    }
+
+    .grip-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .grip-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .grip-text {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Side Grab Handles */
+    .grab-handle-left {
+      left: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 70px;
+      border-radius: 12px;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .grab-handle-right {
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 70px;
+      border-radius: 12px;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    /* Form Design Inside Panel */
+    .panel-header {
+      text-align: center;
+      margin-bottom: 24px;
+      margin-top: 6px;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px auto;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .brand-logo svg {
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .panel-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.4px;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      stroke: #64748b;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: stroke 0.2s;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 42px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .form-input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      stroke: var(--accent-light);
+    }
+
+    .btn-toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .btn-toggle-password:hover {
+      color: #cbd5e1;
+    }
+
+    .btn-toggle-password svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-primary);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--accent-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      color: #a5b4fc;
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 46px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-submit:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    .card-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .create-account-link {
+      color: var(--accent-light);
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .create-account-link:hover {
+      color: #a5b4fc;
+      text-decoration: underline;
+    }
+
+    /* Telemetry / Physics Hint Footer inside Card */
+    .physics-hint {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .physics-hint-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .physics-hint-item svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* Accessibility: Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .login-panel {
+        position: relative !important;
+        transform: none !important;
+        margin: 100px auto;
+      }
+      .grab-handle, .top-controls {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+
+  <!-- Top Floating Controls -->
+  <div class="top-controls">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span id="physics-status">Gravity Engine Active</span>
+    </div>
+    <div class="divider-v"></div>
+    <button id="btn-reset-pos" class="btn-reset" title="Reset panel position">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset Position
+    </button>
+  </div>
+
+  <!-- Physics Container World -->
+  <div id="physics-world">
+    <div id="login-card" class="login-panel">
+      <!-- Top Drag / Grab Handle Bar -->
+      <div class="grab-handle grab-handle-top" id="handle-top" title="Click & Drag to hold panel">
+        <div class="grip-dots">
+          <div class="grip-dot"></div>
+          <div class="grip-dot"></div>
+          <div class="grip-dot"></div>
+        </div>
+        <span class="grip-text">Hold Here</span>
+        <div class="grip-dots">
+          <div class="grip-dot"></div>
+          <div class="grip-dot"></div>
+          <div class="grip-dot"></div>
+        </div>
+      </div>
+
+      <!-- Left Grab Handle -->
+      <div class="grab-handle grab-handle-left" id="handle-left" title="Click & Drag">
+        <div class="grip-dot"></div>
+        <div class="grip-dot"></div>
+        <div class="grip-dot"></div>
+      </div>
+
+      <!-- Right Grab Handle -->
+      <div class="grab-handle grab-handle-right" id="handle-right" title="Click & Drag">
+        <div class="grip-dot"></div>
+        <div class="grip-dot"></div>
+        <div class="grip-dot"></div>
+      </div>
+
+      <!-- Form Content -->
+      <div class="panel-header">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h1 class="panel-title">Welcome Back</h1>
+        <p class="panel-subtitle">Sign in to access your secure portal</p>
+      </div>
+
+      <form id="login-form" onsubmit="event.preventDefault(); alert('Login submitted successfully!');">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" class="form-input" placeholder="alex.morgan@example.com" required autocomplete="email">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="••••••••••••" required autocomplete="current-password">
+            <svg class="input-icon" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <button type="button" id="toggle-password" class="btn-toggle-password" title="Toggle password visibility">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember">
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="alert('Password reset link sent!'); return false;">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign In</button>
+
+        <div class="card-footer">
+          Don't have an account? <a href="#" class="create-account-link" onclick="alert('Redirecting to account creation...'); return false;">Create account</a>
+        </div>
+
+        <div class="physics-hint">
+          <div class="physics-hint-item">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            <span>Gravity: 9.8 m/s²</span>
+          </div>
+          <div class="physics-hint-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            <span id="vel-display">0 px/s</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --- Physics Engine & Interaction Controller ---
+    (function() {
+      const panel = document.getElementById('login-card');
+      const resetBtn = document.getElementById('btn-reset-pos');
+      const velDisplay = document.getElementById('vel-display');
+      const togglePasswordBtn = document.getElementById('toggle-password');
+      const passwordInput = document.getElementById('password');
+
+      // Check reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        return;
+      }
+
+      // Physics State Properties
+      let x = 0;             // Position X (top-left offset relative to window)
+      let y = 0;             // Position Y (top-left offset relative to window)
+      let vx = 0;            // Velocity X (px/sec)
+      let vy = 0;            // Velocity Y (px/sec)
+      let angle = 0;         // Rotation angle in degrees
+      let vAngle = 0;        // Angular velocity (degrees/sec)
+
+      // Physical Constants
+      const GRAVITY = 1200;      // Downward gravitational acceleration (px/sec²)
+      const RESTITUTION = 0.45;  // Coefficient of restitution (bounciness floor/ceiling/walls)
+      const AIR_RESISTANCE = 0.992; // Linear air damping
+      const ROTATIONAL_DAMPING = 0.92; // Angular friction damping
+      const RESTORE_TORQUE = 15;  // Rotational spring torque returning angle towards zero when airborne
+
+      // Drag State
+      let isDragging = false;
+      let dragOffsetX = 0;   // Distance from mouse to panel top-left corner
+      let dragOffsetY = 0;
+      let grabPointLocalX = 0; // Local x relative to center of panel
+      let grabPointLocalY = 0; // Local y relative to center of panel
+
+      // Momentum calculation buffer
+      let lastPointerX = 0;
+      let lastPointerY = 0;
+      let lastPointerTime = 0;
+      let pointerVx = 0;
+      let pointerVy = 0;
+
+      let lastTimeStamp = null;
+
+      // Center panel initially
+      function centerPanel() {
+        const panelWidth = panel.offsetWidth || 400;
+        const panelHeight = panel.offsetHeight || 480;
+        x = (window.innerWidth - panelWidth) / 2;
+        y = (window.innerHeight - panelHeight) / 3; // slightly higher than center
+        vx = 0;
+        vy = 0;
+        angle = 0;
+        vAngle = 0;
+      }
+
+      // Initialize initial position
+      centerPanel();
+
+      // Password toggle
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+      });
+
+      // Reset button handler
+      resetBtn.addEventListener('click', () => {
+        centerPanel();
+      });
+
+      // Pointer event handlers for Grab & Drag
+      function onPointerDown(e) {
+        // Ignore clicks on inputs or buttons unless directly grabbing handle or panel container
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'LABEL') {
+          return;
+        }
+
+        isDragging = true;
+        panel.classList.add('is-dragging');
+
+        const rect = panel.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+        dragOffsetX = clientX - x;
+        dragOffsetY = clientY - y;
+
+        // Local grab offset from center of panel for realistic torque rotation
+        const centerX = x + rect.width / 2;
+        const centerY = y + rect.height / 2;
+        grabPointLocalX = clientX - centerX;
+        grabPointLocalY = clientY - centerY;
+
+        lastPointerX = clientX;
+        lastPointerY = clientY;
+        lastPointerTime = performance.now();
+        pointerVx = 0;
+        pointerVy = 0;
+
+        // Stop current velocities
+        vx = 0;
+        vy = 0;
+        vAngle = 0;
+
+        if (e.pointerId) {
+          try { panel.setPointerCapture(e.pointerId); } catch(err){}
+        }
+      }
+
+      function onPointerMove(e) {
+        if (!isDragging) return;
+
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+        const now = performance.now();
+        const dt = (now - lastPointerTime) / 1000;
+
+        if (dt > 0.005) {
+          pointerVx = (clientX - lastPointerX) / dt;
+          pointerVy = (clientY - lastPointerY) / dt;
+          lastPointerX = clientX;
+          lastPointerY = clientY;
+          lastPointerTime = now;
+        }
+
+        // New desired top-left position
+        x = clientX - dragOffsetX;
+        y = clientY - dragOffsetY;
+
+        // Subtle tilt based on drag speed
+        const targetAngle = Math.max(-25, Math.min(25, pointerVx * 0.02));
+        angle += (targetAngle - angle) * 0.2;
+      }
+
+      function onPointerUp(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        panel.classList.remove('is-dragging');
+
+        // Impart pointer velocity to physics body on release
+        vx = Math.max(-2000, Math.min(2000, pointerVx));
+        vy = Math.max(-2000, Math.min(2000, pointerVy));
+
+        // Impart angular velocity based on horizontal release speed and grab offset
+        vAngle = Math.max(-120, Math.min(120, pointerVx * 0.05 + (grabPointLocalX * 0.1)));
+
+        if (e && e.pointerId) {
+          try { panel.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+      }
+
+      // Attach pointer events to handles and panel
+      const handles = document.querySelectorAll('.grab-handle');
+      handles.forEach(handle => {
+        handle.addEventListener('pointerdown', onPointerDown);
+      });
+
+      // Allow dragging panel itself (outside form inputs)
+      panel.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+
+      // Helper for velocity damping on bounce
+      function getRestitution(velocity) {
+        if (Math.abs(velocity) < 100) return 0.2;
+        return RESTITUTION;
+      }
+
+      // Main Physics Animation Loop
+      function physicsLoop(timestamp) {
+        if (!lastTimeStamp) lastTimeStamp = timestamp;
+        let dt = (timestamp - lastTimeStamp) / 1000;
+        lastTimeStamp = timestamp;
+
+        // Cap dt to prevent huge leaps if tab is inactive
+        if (dt > 0.1) dt = 0.1;
+
+        const panelWidth = panel.offsetWidth || 400;
+        const panelHeight = panel.offsetHeight || 480;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        if (!isDragging) {
+          // 1. Apply Gravity Acceleration
+          vy += GRAVITY * dt;
+
+          // 2. Air resistance damping
+          vx *= Math.pow(AIR_RESISTANCE, dt * 60);
+          vy *= Math.pow(AIR_RESISTANCE, dt * 60);
+          vAngle *= Math.pow(ROTATIONAL_DAMPING, dt * 60);
+
+          // Rotational spring torque pushing angle gently back towards upright
+          vAngle -= angle * RESTORE_TORQUE * dt;
+
+          // 3. Update Position & Rotation
+          x += vx * dt;
+          y += vy * dt;
+          angle += vAngle * dt;
+
+          // 4. Boundary Collision Detection & Gentle Bouncing
+          // Bottom Floor Collision
+          const maxY = screenHeight - panelHeight;
+          if (y >= maxY) {
+            y = maxY;
+            if (vy > 0) {
+              vy = -vy * getRestitution(vy);
+              // Impart rotation on ground bounce if tilted
+              vAngle += -angle * 2.5;
+              vx *= 0.8; // ground friction
+            }
+          }
+
+          // Top Ceiling Collision
+          if (y <= 0) {
+            y = 0;
+            if (vy < 0) {
+              vy = -vy * RESTITUTION;
+            }
+          }
+
+          // Left Wall Collision
+          if (x <= 0) {
+            x = 0;
+            if (vx < 0) {
+              vx = -vx * RESTITUTION;
+              vAngle += vy * 0.05;
+            }
+          }
+
+          // Right Wall Collision
+          const maxX = screenWidth - panelWidth;
+          if (x >= maxX) {
+            x = maxX;
+            if (vx > 0) {
+              vx = -vx * RESTITUTION;
+              vAngle -= vy * 0.05;
+            }
+          }
+
+          // Safety clamp to ensure card is never stuck lost offscreen
+          x = Math.max(0, Math.min(maxX, x));
+
+          // Prevent infinite micro-bouncing sleeping state
+          if (Math.abs(vy) < 15 && Math.abs(maxY - y) < 2) {
+            vy = 0;
+            y = maxY;
+          }
+          if (Math.abs(vx) < 5) vx = 0;
+          if (Math.abs(angle) < 0.1 && Math.abs(vAngle) < 0.1) {
+            angle = 0;
+            vAngle = 0;
+          }
+        }
+
+        // Clamp rotation to reasonable aesthetic limits
+        angle = Math.max(-35, Math.min(35, angle));
+
+        // Render Transform
+        panel.style.transform = `translate3d(${x}px, ${y}px, 0px) rotate(${angle}deg)`;
+
+        // Update Velocity Telemetry Display
+        const currentSpeed = Math.round(Math.sqrt(vx * vx + vy * vy));
+        if (velDisplay) {
+          velDisplay.textContent = `${currentSpeed} px/s`;
+        }
+
+        requestAnimationFrame(physicsLoop);
+      }
+
+      // Handle Window Resize
+      window.addEventListener('resize', () => {
+        const panelWidth = panel.offsetWidth || 400;
+        const panelHeight = panel.offsetHeight || 480;
+        // Keep inside bounds if screen shrinks
+        x = Math.max(0, Math.min(window.innerWidth - panelWidth, x));
+        y = Math.max(0, Math.min(window.innerHeight - panelHeight, y));
+      });
+
+      requestAnimationFrame(physicsLoop);
+    })();
+  </script>
+</body>
+</html>
