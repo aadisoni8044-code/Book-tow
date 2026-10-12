@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquid Morphing Login Screen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070913;
+      --card-bg: rgba(255, 255, 255, 0.04);
+      --card-border: rgba(255, 255, 255, 0.15);
+      --primary-cyan: #00f2fe;
+      --primary-blue: #4facfe;
+      --accent-purple: #7f00ff;
+      --accent-pink: #e100ff;
+      --text-main: #f0f4f8;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(255, 255, 255, 0.05);
+      --input-border: rgba(255, 255, 255, 0.12);
+      --input-focus: rgba(79, 172, 254, 0.5);
+      --radius-lg: 28px;
+      --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: var(--font-family);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Ambient Background Canvas */
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Main Container */
+    .viewport-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      perspective: 1000px;
+    }
+
+    /* Liquid Card Wrapper */
+    .liquid-card-container {
+      position: relative;
+      width: 420px;
+      min-height: 520px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: none;
+      cursor: grab;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .liquid-card-container:active {
+      cursor: grabbing;
+    }
+
+    /* Canvas for Liquid Surface, Morphing Path & Ripples */
+    #liquid-canvas {
+      position: absolute;
+      top: -60px;
+      left: -60px;
+      width: calc(100% + 120px);
+      height: calc(100% + 120px);
+      z-index: 1;
+      pointer-events: none;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 25px rgba(0, 242, 254, 0.15));
+    }
+
+    /* Glass Content Container */
+    .card-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      padding: 44px 38px;
+      border-radius: var(--radius-lg);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Header Styling */
+    .card-header {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Form Styling */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+      letter-spacing: 0.2px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: stroke 0.3s ease;
+      pointer-events: none;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px 14px 48px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 16px;
+      color: var(--text-main);
+      font-family: var(--font-family);
+      font-size: 15px;
+      outline: none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .form-input::placeholder {
+      color: #64748b;
+    }
+
+    .form-input:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.25), inset 0 0 10px rgba(0, 242, 254, 0.1);
+    }
+
+    .form-input:focus ~ .input-icon {
+      stroke: var(--primary-cyan);
+    }
+
+    /* Password Toggle Eye */
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: color 0.3s ease, background 0.3s ease;
+    }
+
+    .toggle-password:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Forgot Password Link */
+    .forgot-link {
+      font-size: 12px;
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-cyan);
+      text-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      position: relative;
+      width: 100%;
+      padding: 16px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-blue) 100%);
+      border: none;
+      border-radius: 16px;
+      color: #040914;
+      font-family: var(--font-family);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 242, 254, 0.3);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 242, 254, 0.45);
+      background: linear-gradient(135deg, #38ef7d 0%, var(--primary-cyan) 100%);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.25);
+    }
+
+    .btn-shine {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+      );
+      transform: rotate(30deg) translateY(-100%);
+      transition: transform 0.8s ease;
+    }
+
+    .submit-btn:hover .btn-shine {
+      transform: rotate(30deg) translateY(100%);
+    }
+
+    /* Footer Signup Link */
+    .card-footer {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .signup-link {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 4px;
+      transition: color 0.3s ease;
+    }
+
+    .signup-link:hover {
+      color: var(--primary-cyan);
+    }
+
+    /* Toast Notification */
+    .toast-message {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 14px 28px;
+      border-radius: 30px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-message.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-cyan);
+      box-shadow: 0 0 10px var(--primary-cyan);
+    }
+
+    /* Accessibility / Controls Bar */
+    .controls-bar {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      z-index: 50;
+      display: flex;
+      gap: 12px;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 12px;
+      font-family: var(--font-family);
+      font-weight: 500;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .control-btn.active {
+      background: rgba(0, 242, 254, 0.15);
+      border-color: var(--primary-cyan);
+      color: var(--primary-cyan);
+    }
+
+    /* Reduced Motion Styling */
+    @media (prefers-reduced-motion: reduce) {
+      .liquid-card-container, #liquid-canvas, #bg-canvas {
+        transition: none !important;
+        animation: none !important;
+      }
+      .liquid-card-container {
+        transform: none !important;
+      }
+    }
+
+    body.reduced-motion .liquid-card-container {
+      transform: none !important;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 480px) {
+      .liquid-card-container {
+        width: 90%;
+        min-height: auto;
+      }
+      .card-content {
+        padding: 34px 26px;
+      }
+      .controls-bar {
+        top: 16px;
+        right: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambient Fluid Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Control Options -->
+  <div class="controls-bar">
+    <button id="reduced-motion-toggle" class="control-btn" aria-label="Toggle Reduced Motion">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M10 15l5-3-5-3v6z"></path>
+      </svg>
+      <span>Reduced Motion</span>
+    </button>
+  </div>
+
+  <!-- Viewport Wrapper for 3D Perspective -->
+  <div class="viewport-container" id="viewport">
+
+    <!-- Liquid Card Container -->
+    <div class="liquid-card-container" id="card-container">
+
+      <!-- Canvas for Rendered Liquid Glass Membrane & Surface Physics -->
+      <canvas id="liquid-canvas"></canvas>
+
+      <!-- Glass UI Content -->
+      <div class="card-content" id="card-content">
+
+        <div class="card-header">
+          <h1 class="card-title">Welcome Back</h1>
+          <p class="card-subtitle">Sign in to your liquid space</p>
+        </div>
+
+        <form class="login-form" id="login-form" onsubmit="return false;">
+
+          <!-- Email Input -->
+          <div class="input-group">
+            <label for="email" class="input-label">Email Address</label>
+            <div class="input-wrapper">
+              <input type="email" id="email" class="form-input" placeholder="alex@liquid.io" required autocomplete="email">
+              <svg class="input-icon" viewBox="0 0 24 24">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="input-group">
+            <div class="input-label">
+              <label for="password">Password</label>
+              <a href="#" class="forgot-link" id="forgot-password">Forgot?</a>
+            </div>
+            <div class="input-wrapper">
+              <input type="password" id="password" class="form-input" placeholder="••••••••••••" required autocomplete="current-password">
+              <svg class="input-icon" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <button type="button" class="toggle-password" id="toggle-password" aria-label="Toggle Password Visibility">
+                <svg id="eye-icon" viewBox="0 0 24 24">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn" id="submit-btn">
+            <span class="btn-shine"></span>
+            <span class="btn-text">Sign In</span>
+          </button>
+
+        </form>
+
+        <div class="card-footer">
+          <span>Don't have an account?</span>
+          <a href="#" class="signup-link" id="signup-link">Create one</a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Message -->
+  <div class="toast-message" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toast-text">Liquid interaction activated</span>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. AMBIENT BACKGROUND FLUID CANVAS
+       ========================================================================== */
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+
+    let bgWidth, bgHeight;
+    const bgBlobs = [];
+
+    function initBgCanvas() {
+      bgWidth = bgCanvas.width = window.innerWidth;
+      bgHeight = bgCanvas.height = window.innerHeight;
+
+      bgBlobs.length = 0;
+      const colors = [
+        'rgba(0, 242, 254, 0.18)',
+        'rgba(79, 172, 254, 0.15)',
+        'rgba(127, 0, 255, 0.12)',
+        'rgba(225, 0, 255, 0.10)'
+      ];
+
+      for (let i = 0; i < 6; i++) {
+        bgBlobs.push({
+          x: Math.random() * bgWidth,
+          y: Math.random() * bgHeight,
+          radius: Math.random() * 200 + 150,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          color: colors[i % colors.length]
+        });
+      }
+    }
+
+    function renderBgCanvas() {
+      bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+
+      // Deep radial core gradient
+      const gradient = bgCtx.createRadialGradient(
+        bgWidth / 2, bgHeight / 2, 0,
+        bgWidth / 2, bgHeight / 2, Math.max(bgWidth, bgHeight) * 0.8
+      );
+      gradient.addColorStop(0, '#0c1024');
+      gradient.addColorStop(0.6, '#070913');
+      gradient.addColorStop(1, '#030409');
+      bgCtx.fillStyle = gradient;
+      bgCtx.fillRect(0, 0, bgWidth, bgHeight);
+
+      // Render floating background liquid orbs
+      for (let blob of bgBlobs) {
+        blob.x += blob.vx;
+        blob.y += blob.vy;
+
+        if (blob.x - blob.radius < 0 || blob.x + blob.radius > bgWidth) blob.vx *= -1;
+        if (blob.y - blob.radius < 0 || blob.y + blob.radius > bgHeight) blob.vy *= -1;
+
+        const blobGrad = bgCtx.createRadialGradient(
+          blob.x, blob.y, 0,
+          blob.x, blob.y, blob.radius
+        );
+        blobGrad.addColorStop(0, blob.color);
+        blobGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        bgCtx.fillStyle = blobGrad;
+        bgCtx.beginPath();
+        bgCtx.arc(blob.x, blob.y, blob.radius, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+    }
+
+    window.addEventListener('resize', initBgCanvas);
+    initBgCanvas();
+
+    /* ==========================================================================
+       2. LIQUID SPRING MESH PHYSICS ENGINE
+       ========================================================================== */
+    const container = document.getElementById('card-container');
+    const content = document.getElementById('card-content');
+    const liquidCanvas = document.getElementById('liquid-canvas');
+    const lCtx = liquidCanvas.getContext('2d');
+
+    let reducedMotion = false;
+    const reducedMotionBtn = document.getElementById('reduced-motion-toggle');
+
+    reducedMotionBtn.addEventListener('click', () => {
+      reducedMotion = !reducedMotion;
+      reducedMotionBtn.classList.toggle('active', reducedMotion);
+      document.body.classList.toggle('reduced-motion', reducedMotion);
+      showToast(reducedMotion ? 'Reduced motion enabled' : 'Liquid physics enabled');
+    });
+
+    // Node Count for Liquid Perimeter Elastic Mesh
+    const NUM_NODES = 32;
+    const nodes = [];
+    const ripples = [];
+
+    let cardWidth = 0;
+    let cardHeight = 0;
+    let canvasW = 0;
+    let canvasH = 0;
+    const PADDING = 60; // Extra canvas padding for liquid expansion
+
+    // Dragging & Interaction State
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let cardOffsetX = 0;
+    let cardOffsetY = 0;
+    let targetCardX = 0;
+    let targetCardY = 0;
+    let currentCardX = 0;
+    let currentCardY = 0;
+
+    // 3D Tilt State
+    let tiltX = 0;
+    let tiltY = 0;
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+
+    // Pointer coordinates relative to card center
+    let mouseRelX = 0;
+    let mouseRelY = 0;
+
+    // Elastic Node Class
+    class SpringNode {
+      constructor(baseX, baseY, normalX, normalY) {
+        this.baseX = baseX;
+        this.baseY = baseY;
+        this.x = baseX;
+        this.y = baseY;
+        this.vx = 0;
+        this.vy = 0;
+        this.normalX = normalX;
+        this.normalY = normalY;
+
+        // Physics Parameters
+        this.stiffness = 0.045;
+        this.damping = 0.82;
+        this.mass = 1.0;
+      }
+
+      update() {
+        // Return force towards rest base position
+        const fx = (this.baseX - this.x) * this.stiffness;
+        const fy = (this.baseY - this.y) * this.stiffness;
+
+        this.vx += fx / this.mass;
+        this.vy += fy / this.mass;
+
+        this.vx *= this.damping;
+        this.vy *= this.damping;
+
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+
+      applyForce(fx, fy) {
+        this.vx += fx / this.mass;
+        this.vy += fy / this.mass;
+      }
+    }
+
+    function setupLiquidMesh() {
+      const rect = content.getBoundingClientRect();
+      cardWidth = rect.width;
+      cardHeight = rect.height;
+
+      canvasW = cardWidth + PADDING * 2;
+      canvasH = cardHeight + PADDING * 2;
+
+      const dpr = window.devicePixelRatio || 1;
+      liquidCanvas.width = canvasW * dpr;
+      liquidCanvas.height = canvasH * dpr;
+      liquidCanvas.style.width = canvasW + 'px';
+      liquidCanvas.style.height = canvasH + 'px';
+
+      lCtx.scale(dpr, dpr);
+
+      // Re-initialize dynamic rounded rectangle perimeter spring nodes
+      nodes.length = 0;
+      const cornerRadius = 28;
+      const w = cardWidth;
+      const h = cardHeight;
+      const cx = PADDING;
+      const cy = PADDING;
+
+      // Sample perimeter path
+      const pathPoints = [];
+
+      // Top edge
+      for (let i = 0; i < 8; i++) {
+        const t = i / 8;
+        const x = cx + cornerRadius + t * (w - 2 * cornerRadius);
+        const y = cy;
+        pathPoints.push({ x, y, nx: 0, ny: -1 });
+      }
+      // Top-right corner
+      for (let i = 0; i < 4; i++) {
+        const a = -Math.PI/2 + (i / 4) * (Math.PI/2);
+        const x = cx + w - cornerRadius + Math.cos(a) * cornerRadius;
+        const y = cy + cornerRadius + Math.sin(a) * cornerRadius;
+        pathPoints.push({ x, y, nx: Math.cos(a), ny: Math.sin(a) });
+      }
+      // Right edge
+      for (let i = 0; i < 8; i++) {
+        const t = i / 8;
+        const x = cx + w;
+        const y = cy + cornerRadius + t * (h - 2 * cornerRadius);
+        pathPoints.push({ x, y, nx: 1, ny: 0 });
+      }
+      // Bottom-right corner
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * (Math.PI/2);
+        const x = cx + w - cornerRadius + Math.cos(a) * cornerRadius;
+        const y = cy + h - cornerRadius + Math.sin(a) * cornerRadius;
+        pathPoints.push({ x, y, nx: Math.cos(a), ny: Math.sin(a) });
+      }
+      // Bottom edge
+      for (let i = 0; i < 8; i++) {
+        const t = i / 8;
+        const x = cx + w - cornerRadius - t * (w - 2 * cornerRadius);
+        const y = cy + h;
+        pathPoints.push({ x, y, nx: 0, ny: 1 });
+      }
+      // Bottom-left corner
+      for (let i = 0; i < 4; i++) {
+        const a = Math.PI/2 + (i / 4) * (Math.PI/2);
+        const x = cx + cornerRadius + Math.cos(a) * cornerRadius;
+        const y = cy + h - cornerRadius + Math.sin(a) * cornerRadius;
+        pathPoints.push({ x, y, nx: Math.cos(a), ny: Math.sin(a) });
+      }
+      // Left edge
+      for (let i = 0; i < 8; i++) {
+        const t = i / 8;
+        const x = cx;
+        const y = cy + h - cornerRadius - t * (h - 2 * cornerRadius);
+        pathPoints.push({ x, y, nx: -1, ny: 0 });
+      }
+      // Top-left corner
+      for (let i = 0; i < 4; i++) {
+        const a = Math.PI + (i / 4) * (Math.PI/2);
+        const x = cx + cornerRadius + Math.cos(a) * cornerRadius;
+        const y = cy + cornerRadius + Math.sin(a) * cornerRadius;
+        pathPoints.push({ x, y, nx: Math.cos(a), ny: Math.sin(a) });
+      }
+
+      for (let p of pathPoints) {
+        nodes.push(new SpringNode(p.x, p.y, p.nx, p.ny));
+      }
+    }
+
+    /* Create Liquid Surface Ripples */
+    function addRipple(x, y, intensity = 1.0) {
+      ripples.push({
+        x: x + PADDING,
+        y: y + PADDING,
+        radius: 5,
+        maxRadius: Math.max(cardWidth, cardHeight) * 0.9,
+        alpha: 0.8 * intensity,
+        speed: 4.5
+      });
+    }
+
+    /* ==========================================================================
+       3. USER INTERACTION & POINTER EVENTS (MOUSE & TOUCH)
+       ========================================================================== */
+    function getPointerPos(e) {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function onPointerDown(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A') {
+        return; // Allow form element standard interaction
+      }
+
+      isDragging = true;
+      const pos = getPointerPos(e);
+      dragStartX = pos.x;
+      dragStartY = pos.y;
+
+      const rect = container.getBoundingClientRect();
+      const localX = pos.x - rect.left;
+      const localY = pos.y - rect.top;
+
+      // Add ripple at click/touch point
+      addRipple(localX, localY, 1.2);
+
+      // Apply initial liquid nudge towards pointer
+      for (let node of nodes) {
+        const dx = localX + PADDING - node.baseX;
+        const dy = localY + PADDING - node.baseY;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 180) {
+          const force = (1 - dist / 180) * 18;
+          node.applyForce((dx / dist) * force, (dy / dist) * force);
+        }
+      }
+    }
+
+    function onPointerMove(e) {
+      const pos = getPointerPos(e);
+      const rect = container.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+
+      mouseRelX = (pos.x - cardCenterX) / (rect.width / 2);
+      mouseRelY = (pos.y - cardCenterY) / (rect.height / 2);
+
+      // Calculate 3D tilt
+      if (!reducedMotion) {
+        targetTiltX = -mouseRelY * 12;
+        targetTiltY = mouseRelX * 12;
+      }
+
+      if (isDragging && !reducedMotion) {
+        const deltaX = pos.x - dragStartX;
+        const deltaY = pos.y - dragStartY;
+
+        targetCardX = deltaX * 0.85;
+        targetCardY = deltaY * 0.85;
+
+        // Pull perimeter nodes toward pointer direction for elastic liquid stretching
+        const pullX = deltaX * 0.12;
+        const pullY = deltaY * 0.12;
+
+        for (let node of nodes) {
+          // Stretch nodes in direction of drag with intensity based on normal alignment
+          const dot = node.normalX * (deltaX / 100) + node.normalY * (deltaY / 100);
+          if (dot > 0) {
+            node.applyForce(pullX * dot * 0.6, pullY * dot * 0.6);
+          }
+        }
+      } else if (!reducedMotion) {
+        // Hover surface wave perturbation
+        const localX = pos.x - rect.left;
+        const localY = pos.y - rect.top;
+
+        for (let node of nodes) {
+          const dx = localX + PADDING - node.x;
+          const dy = localY + PADDING - node.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 90) {
+            const force = (1 - dist / 90) * 2.5;
+            node.applyForce(-node.normalX * force, -node.normalY * force);
+          }
+        }
+      }
+    }
+
+    function onPointerUp() {
+      if (!isDragging) return;
+      isDragging = false;
+
+      // Spring release: create jelly wobble oscillation on return
+      const releaseVelX = -currentCardX * 0.25;
+      const releaseVelY = -currentCardY * 0.25;
+
+      targetCardX = 0;
+      targetCardY = 0;
+
+      for (let node of nodes) {
+        node.applyForce(
+          releaseVelX + (Math.random() - 0.5) * 12,
+          releaseVelY + (Math.random() - 0.5) * 12
+        );
+      }
+
+      addRipple(cardWidth / 2, cardHeight / 2, 1.5);
+    }
+
+    // Attach dual Mouse/Touch events
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+
+    /* ==========================================================================
+       4. ANIMATION LOOP & LIQUID RENDERING
+       ========================================================================== */
+    function animate() {
+      renderBgCanvas();
+
+      if (!reducedMotion) {
+        // Smooth Card Drag Interpolation
+        currentCardX += (targetCardX - currentCardX) * 0.12;
+        currentCardY += (targetCardY - currentCardY) * 0.12;
+
+        // Smooth 3D Tilt Interpolation
+        tiltX += (targetTiltX - tiltX) * 0.1;
+        tiltY += (targetTiltY - tiltY) * 0.1;
+
+        if (!isDragging) {
+          targetTiltX *= 0.92;
+          targetTiltY *= 0.92;
+        }
+
+        container.style.transform = `translate3d(${currentCardX}px, ${currentCardY}px, 0px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      } else {
+        container.style.transform = 'none';
+      }
+
+      // Clear Liquid Canvas
+      lCtx.clearRect(0, 0, canvasW, canvasH);
+
+      // Neighbor Spring Coupling for Surface Wave Propagation
+      const lenNodes = nodes.length;
+      if (lenNodes > 0 && !reducedMotion) {
+        for (let i = 0; i < lenNodes; i++) {
+          const prev = nodes[(i - 1 + lenNodes) % lenNodes];
+          const next = nodes[(i + 1) % lenNodes];
+          const curr = nodes[i];
+
+          const neighborFx = ((prev.x - curr.x) + (next.x - curr.x)) * 0.018;
+          const neighborFy = ((prev.y - curr.y) + (next.y - curr.y)) * 0.018;
+
+          curr.vx += neighborFx;
+          curr.vy += neighborFy;
+        }
+      }
+
+      // Update Elastic Nodes
+      for (let node of nodes) {
+        node.update();
+      }
+
+      // Render Dynamic Liquid Glass Path (Smooth Curved Polygon)
+      if (nodes.length > 0) {
+        lCtx.beginPath();
+
+        // Catmull-Rom / Midpoint Smooth Spline through perimeter nodes
+        const len = nodes.length;
+        let midX = (nodes[0].x + nodes[len - 1].x) / 2;
+        let midY = (nodes[0].y + nodes[len - 1].y) / 2;
+        lCtx.moveTo(midX, midY);
+
+        for (let i = 0; i < len; i++) {
+          const nextNode = nodes[(i + 1) % len];
+          const currNode = nodes[i];
+          const mx = (currNode.x + nextNode.x) / 2;
+          const my = (currNode.y + nextNode.y) / 2;
+          lCtx.quadraticCurveTo(currNode.x, currNode.y, mx, my);
+        }
+        lCtx.closePath();
+
+        // Base Glass Fill Gradient
+        const glassGrad = lCtx.createLinearGradient(0, 0, canvasW, canvasH);
+        glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+        glassGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)');
+        glassGrad.addColorStop(1, 'rgba(0, 242, 254, 0.08)');
+        lCtx.fillStyle = glassGrad;
+        lCtx.fill();
+
+        // Liquid Glass Specular Edge Highlight Stroke
+        const strokeGrad = lCtx.createLinearGradient(0, 0, canvasW, canvasH);
+        strokeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        strokeGrad.addColorStop(0.4, 'rgba(255, 255, 255, 0.12)');
+        strokeGrad.addColorStop(0.8, 'rgba(0, 242, 254, 0.35)');
+        strokeGrad.addColorStop(1, 'rgba(225, 0, 255, 0.25)');
+
+        lCtx.lineWidth = 2.5;
+        lCtx.strokeStyle = strokeGrad;
+        lCtx.stroke();
+
+        // Liquid Top Reflection Arc
+        lCtx.save();
+        lCtx.clip();
+        const reflGrad = lCtx.createLinearGradient(0, PADDING, 0, PADDING + 120);
+        reflGrad.addColorStop(0, 'rgba(255, 255, 255, 0.22)');
+        reflGrad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+        lCtx.fillStyle = reflGrad;
+        lCtx.beginPath();
+        lCtx.ellipse(canvasW / 2, PADDING + 10, cardWidth * 0.45, 35, 0, 0, Math.PI * 2);
+        lCtx.fill();
+        lCtx.restore();
+      }
+
+      // Render Surface Ripples
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.radius += r.speed;
+        r.alpha -= 0.018;
+
+        if (r.alpha <= 0 || r.radius >= r.maxRadius) {
+          ripples.splice(i, 1);
+          continue;
+        }
+
+        lCtx.beginPath();
+        lCtx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        lCtx.strokeStyle = `rgba(0, 242, 254, ${r.alpha})`;
+        lCtx.lineWidth = 1.8;
+        lCtx.stroke();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Initialize liquid mesh dimensions and start animation
+    setTimeout(() => {
+      setupLiquidMesh();
+      requestAnimationFrame(animate);
+    }, 50);
+
+    window.addEventListener('resize', setupLiquidMesh);
+
+    /* ==========================================================================
+       5. FORM INTERACTIONS & UI UTILITIES
+       ========================================================================== */
+    // Password Visibility Toggle
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    togglePasswordBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+
+      eyeIcon.innerHTML = isPassword
+        ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+        : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+
+      showToast(isPassword ? 'Password visible' : 'Password hidden');
+    });
+
+    // Form Submission Simulation
+    const loginForm = document.getElementById('login-form');
+    const submitBtn = document.getElementById('submit-btn');
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+
+      submitBtn.classList.add('loading');
+      submitBtn.style.opacity = '0.8';
+      submitBtn.querySelector('.btn-text').textContent = 'Authenticating...';
+
+      // Liquid energy pulse across perimeter nodes
+      for (let node of nodes) {
+        node.applyForce(node.normalX * 15, node.normalY * 15);
+      }
+      addRipple(cardWidth / 2, cardHeight / 2, 2.0);
+
+      setTimeout(() => {
+        submitBtn.classList.remove('loading');
+        submitBtn.style.opacity = '1';
+        submitBtn.querySelector('.btn-text').textContent = 'Success!';
+        showToast(`Welcome back, ${email.split('@')[0]}!`);
+
+        setTimeout(() => {
+          submitBtn.querySelector('.btn-text').textContent = 'Sign In';
+        }, 2000);
+      }, 1200);
+    });
+
+    // Toast Notification System
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    let toastTimeout;
+
+    function showToast(message) {
+      toastText.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Links Interaction
+    document.getElementById('forgot-password').addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('Password reset link sent');
+    });
+
+    document.getElementById('signup-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      showToast('Redirecting to Registration...');
+    });
+  </script>
+</body>
+</html>
