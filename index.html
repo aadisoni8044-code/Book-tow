@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Beauty - Sign In</title>
+  <style>
+    :root {
+      --bg-dark: #08070b;
+      --bg-card: rgba(255, 255, 255, 0.94);
+      --text-main: #1f1f1f;
+      --text-muted: #5f6368;
+      --accent-gold: #d4af37;
+      --accent-glow: rgba(212, 175, 55, 0.15);
+      --google-blue: #1a73e8;
+      --google-blue-hover: #1557b0;
+      --border-light: #dadce0;
+      --radius-panel: 24px;
+      --font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+    }
+
+    /* Ambient dynamic lighting backdrop */
+    .ambient-bg {
+      position: absolute;
+      inset: -10%;
+      background: radial-gradient(circle at 50% 50%, rgba(45, 30, 55, 0.6) 0%, rgba(12, 10, 18, 0.95) 60%, var(--bg-dark) 100%);
+      transition: background 0.15s ease-out;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(212, 175, 55, 0) 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: blur(40px);
+      z-index: 2;
+      pointer-events: none;
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Main Container with 3D Parallax */
+    .app-container {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      height: 100%;
+      max-height: 800px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      padding: 20px;
+    }
+
+    /* Stage wrapper holding portrait and login panel */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Portrait Wrapper */
+    .portrait-card {
+      position: absolute;
+      width: 480px;
+      height: 640px;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #121018;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 5;
+    }
+
+    .portrait-card.settled {
+      left: 22%;
+      transform: translateX(-50%);
+    }
+
+    /* Dual Canvas Layers */
+    canvas.portrait-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #canvas-after {
+      z-index: 2;
+      clip-path: polygon(0 0, 0% 0, 0% 100%, 0 100%);
+    }
+
+    #canvas-before {
+      z-index: 1;
+    }
+
+    /* Sweep Line Overlay */
+    .sweep-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 215, 0, 0.9), rgba(255, 255, 255, 0));
+      box-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700;
+      z-index: 4;
+      left: 0%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sweep-line.active {
+      opacity: 1;
+    }
+
+    /* Before/After Badges */
+    .badge {
+      position: absolute;
+      bottom: 24px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+      z-index: 6;
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .badge-before {
+      left: 24px;
+      background: rgba(0, 0, 0, 0.55);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .badge-after {
+      right: 24px;
+      background: rgba(212, 175, 55, 0.25);
+      color: #fff;
+      border-color: rgba(212, 175, 55, 0.5);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .badge-after.visible {
+      opacity: 1;
+    }
+
+    /* Google-inspired Login Panel */
+    .login-panel {
+      position: absolute;
+      width: 420px;
+      padding: 40px;
+      background: var(--bg-card);
+      border-radius: var(--radius-panel);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 0, 0, 0.2);
+      color: var(--text-main);
+      z-index: 10;
+      opacity: 0;
+      transform: translate(-180%, 0) scale(0.95);
+      transition: none;
+      left: 50%;
+    }
+
+    .login-panel.animating {
+      opacity: 0.98;
+    }
+
+    .login-panel.settled {
+      opacity: 1;
+      left: 70%;
+      transform: translate(-50%, 0) scale(1);
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, left 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #202124;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Google Sign-in Button */
+    .btn-google {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--border-light);
+      border-radius: 24px;
+      background: #ffffff;
+      color: #3c4043;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .btn-google:hover {
+      background-color: #f8f9fa;
+      border-color: #c6c9ce;
+      box-shadow: 0 1px 3px rgba(60,64,67,0.15);
+    }
+
+    .btn-google:active {
+      background-color: #f1f3f4;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 24px;
+      color: #70757a;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+
+    /* Input Fields */
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 52px;
+      padding: 16px 14px 4px 14px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #202124;
+      outline: none;
+      background: transparent;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--google-blue);
+      border-width: 2px;
+      padding: 15px 13px 3px 13px;
+    }
+
+    .input-label {
+      position: absolute;
+      left: 14px;
+      top: 16px;
+      font-size: 0.95rem;
+      color: #5f6368;
+      pointer-events: none;
+      transition: 0.2s ease all;
+      background: transparent;
+    }
+
+    .input-field:focus ~ .input-label,
+    .input-field:not(:placeholder-shown) ~ .input-label {
+      top: 6px;
+      font-size: 0.72rem;
+      color: var(--google-blue);
+      font-weight: 500;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background: var(--google-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 24px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--google-blue-hover);
+      box-shadow: 0 2px 6px rgba(26,115,232,0.3);
+    }
+
+    .security-notice {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: #70757a;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .security-notice a {
+      color: var(--google-blue);
+      text-decoration: none;
+    }
+
+    .security-notice a:hover {
+      text-decoration: underline;
+    }
+
+    /* Floating Interactive Controls */
+    .controls-bar {
+      position: absolute;
+      bottom: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .btn-control {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: background 0.2s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-control:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Mobile Responsive Layout */
+    @media (max-width: 900px) {
+      .app-container {
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 16px;
+        max-height: 100vh;
+        overflow-y: auto;
+      }
+
+      .stage {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        justify-content: center;
+        gap: 24px;
+        padding-top: 20px;
+        padding-bottom: 60px;
+      }
+
+      .portrait-card {
+        position: relative;
+        width: 320px;
+        height: 440px;
+        left: auto !important;
+        transform: none !important;
+        margin: 0 auto;
+      }
+
+      .login-panel {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        left: auto !important;
+        transform: none !important;
+        padding: 28px 20px;
+        margin: 0 auto;
+      }
+
+      .controls-bar {
+        bottom: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic ambient background -->
+  <div class="ambient-bg" id="ambient-bg"></div>
+  <div class="ambient-glow" id="ambient-glow"></div>
+
+  <!-- Main interactive 3D container -->
+  <div class="app-container" id="app-container">
+    <div class="stage">
+
+      <!-- Portrait Canvas Card -->
+      <div class="portrait-card" id="portrait-card">
+        <canvas id="canvas-before" class="portrait-layer" width="480" height="640"></canvas>
+        <canvas id="canvas-after" class="portrait-layer" width="480" height="640"></canvas>
+        <div class="sweep-line" id="sweep-line"></div>
+        <div class="badge badge-before">Original</div>
+        <div class="badge badge-after" id="badge-after">Radiant Clear</div>
+      </div>
+
+      <!-- Google-inspired Login Panel -->
+      <div class="login-panel" id="login-panel">
+        <div class="brand-header">
+          <div class="brand-logo">
+            <svg width="40" height="40" viewBox="0 0 40 40">
+              <path fill="#4285F4" d="M20 8.3c2.7 0 5.1.9 7 2.7l5.2-5.2C29 2.8 24.8 1 20 1 12.3 1 5.8 5.4 2.8 11.8l6.3 4.9C10.6 11.5 14.9 8.3 20 8.3z"/>
+              <path fill="#34A853" d="M38.6 20.4c0-1.4-.1-2.7-.4-4H20v8.1h10.5c-.5 2.5-1.9 4.6-4 6l6.2 4.8c3.6-3.3 5.9-8.3 5.9-14.9z"/>
+              <path fill="#FBBC05" d="M9.1 23.3c-.5-1.4-.8-2.9-.8-4.3s.3-2.9.8-4.3L2.8 9.8C1 13.4 0 16.6 0 20s1 6.6 2.8 10.2l6.3-4.9z"/>
+              <path fill="#EA4335" d="M20 38.9c5.4 0 10-1.8 13.3-4.9l-6.2-4.8c-1.8 1.2-4.1 1.9-7.1 1.9-5.1 0-9.4-3.2-10.9-7.6L2.8 28.4C5.8 34.8 12.3 38.9 20 38.9z"/>
+            </svg>
+          </div>
+          <h1 class="brand-title">Welcome to Aura</h1>
+          <p class="brand-subtitle">Sign in with your Google Account</p>
+        </div>
+
+        <button class="btn-google" id="btn-google-auth">
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.25h2.91c1.7-1.56 2.69-3.87 2.69-6.61z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.25c-.8.54-1.83.87-3.05.87-2.34 0-4.33-1.58-5.03-3.71H.95v2.33C2.43 15.98 5.48 18 9 18z"/>
+            <path fill="#FBBC05" d="M3.97 10.73A5.41 5.41 0 0 1 3.68 9c0-.6.1-1.18.29-1.73V4.94H.95A8.996 8.996 0 0 0 0 9c0 1.45.35 2.82.95 4.06l3.02-2.33z"/>
+            <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.46.89 11.42 0 9 0 5.48 0 2.43 2.02.95 4.94l3.02 2.33C4.67 5.16 6.66 3.58 9 3.58z"/>
+          </svg>
+          Sign in with Google
+        </button>
+
+        <div class="divider">
+          <span>or sign in with demo email</span>
+        </div>
+
+        <form id="demo-login-form" onsubmit="event.preventDefault();">
+          <div class="input-group">
+            <input type="email" id="email" class="input-field" placeholder=" " required autocomplete="off">
+            <label for="email" class="input-label">Email or phone</label>
+          </div>
+
+          <div class="input-group">
+            <input type="password" id="password" class="input-field" placeholder=" " required autocomplete="off">
+            <label for="password" class="input-label">Password</label>
+          </div>
+
+          <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+
+        <p class="security-notice">
+          Demo purpose only. Real authentication utilizes official Google OAuth 2.0 protocol. Never enter actual passwords into unverified forms.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Floating interactive controls -->
+    <div class="controls-bar">
+      <button class="btn-control" id="btn-replay">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Replay Animation
+      </button>
+      <button class="btn-control" id="btn-toggle-view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Toggle Before/After
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- PORTRAIT CANVAS GENERATOR ---
+    const canvasBefore = document.getElementById('canvas-before');
+    const canvasAfter = document.getElementById('canvas-after');
+    const ctxBefore = canvasBefore.getContext('2d');
+    const ctxAfter = canvasAfter.getContext('2d');
+
+    const W = 480;
+    const H = 640;
+
+    // Helper to draw realistic adult woman portrait
+    function drawBaseWomanPortrait(ctx, isClearVersion = false) {
+      ctx.clearRect(0, 0, W, H);
+
+      // Background lighting inside portrait card
+      const bgGradient = ctx.createRadialGradient(W / 2, H / 2 - 50, 50, W / 2, H / 2, 400);
+      bgGradient.addColorStop(0, '#2d2138');
+      bgGradient.addColorStop(0.6, '#181224');
+      bgGradient.addColorStop(1, '#0d0914');
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, W, H);
+
+      // Shoulders & Neck
+      const neckGrad = ctx.createLinearGradient(W/2 - 60, H/2 + 100, W/2 + 60, H/2 + 100);
+      neckGrad.addColorStop(0, '#d89b82');
+      neckGrad.addColorStop(0.5, '#e8ab92');
+      neckGrad.addColorStop(1, '#cb8a72');
+
+      ctx.fillStyle = neckGrad;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 45, H / 2 + 80);
+      ctx.lineTo(W / 2 + 45, H / 2 + 80);
+      ctx.lineTo(W / 2 + 160, H);
+      ctx.lineTo(W / 2 - 160, H);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck shadow
+      ctx.fillStyle = 'rgba(60, 20, 20, 0.25)';
+      ctx.beginPath();
+      ctx.ellipse(W / 2, H / 2 + 115, 55, 20, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bust / Silk Outfit
+      const clothGrad = ctx.createLinearGradient(W/2 - 180, H - 120, W/2 + 180, H);
+      clothGrad.addColorStop(0, '#1c152a');
+      clothGrad.addColorStop(0.5, '#2e2244');
+      clothGrad.addColorStop(1, '#150f20');
+      ctx.fillStyle = clothGrad;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 170, H);
+      ctx.quadraticCurveTo(W / 2 - 90, H - 110, W / 2, H - 70);
+      ctx.quadraticCurveTo(W / 2 + 90, H - 110, W / 2 + 170, H);
+      ctx.closePath();
+      ctx.fill();
+
+      // Hair Back Layer
+      ctx.fillStyle = '#1c120c';
+      ctx.beginPath();
+      ctx.ellipse(W / 2, H / 2 - 30, 160, 210, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Face Shape (Egg/Oval)
+      const faceGrad = ctx.createRadialGradient(W / 2, H / 2 - 40, 20, W / 2, H / 2 - 20, 140);
+      if (isClearVersion) {
+        faceGrad.addColorStop(0, '#fbe3d5');
+        faceGrad.addColorStop(0.65, '#f3cbbe');
+        faceGrad.addColorStop(1, '#d89c8a');
+      } else {
+        faceGrad.addColorStop(0, '#f4d5c3');
+        faceGrad.addColorStop(0.65, '#e4b6a4');
+        faceGrad.addColorStop(1, '#c88876');
+      }
+
+      ctx.fillStyle = faceGrad;
+      ctx.beginPath();
+      ctx.ellipse(W / 2, H / 2 - 20, 115, 150, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cheek Contour & Soft Blush
+      const blushGradLeft = ctx.createRadialGradient(W / 2 - 60, H / 2, 5, W / 2 - 60, H / 2, 45);
+      blushGradLeft.addColorStop(0, isClearVersion ? 'rgba(235, 130, 140, 0.35)' : 'rgba(215, 110, 110, 0.3)');
+      blushGradLeft.addColorStop(1, 'rgba(235, 130, 140, 0)');
+      ctx.fillStyle = blushGradLeft;
+      ctx.beginPath();
+      ctx.arc(W / 2 - 60, H / 2, 45, 0, Math.PI * 2);
+      ctx.fill();
+
+      const blushGradRight = ctx.createRadialGradient(W / 2 + 60, H / 2, 5, W / 2 + 60, H / 2, 45);
+      blushGradRight.addColorStop(0, isClearVersion ? 'rgba(235, 130, 140, 0.35)' : 'rgba(215, 110, 110, 0.3)');
+      blushGradRight.addColorStop(1, 'rgba(235, 130, 140, 0)');
+      ctx.fillStyle = blushGradRight;
+      ctx.beginPath();
+      ctx.arc(W / 2 + 60, H / 2, 45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Forehead Glow
+      if (isClearVersion) {
+        const glowGrad = ctx.createRadialGradient(W / 2, H / 2 - 90, 0, W / 2, H / 2 - 90, 70);
+        glowGrad.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+        glowGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = glowGrad;
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2 - 90, 70, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Nose Bridge & Tip
+      ctx.strokeStyle = 'rgba(150, 80, 70, 0.25)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 6, H / 2 - 40);
+      ctx.quadraticCurveTo(W / 2 - 12, H / 2, W / 2 - 14, H / 2 + 15);
+      ctx.quadraticCurveTo(W / 2, H / 2 + 25, W / 2 + 14, H / 2 + 15);
+      ctx.stroke();
+
+      // Nostril Shading
+      ctx.fillStyle = 'rgba(110, 50, 40, 0.35)';
+      ctx.beginPath();
+      ctx.arc(W / 2 - 10, H / 2 + 18, 4, 0, Math.PI * 2);
+      ctx.arc(W / 2 + 10, H / 2 + 18, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Eyes
+      const drawEye = (centerX, centerY) => {
+        // Eye White
+        ctx.fillStyle = '#f8f8f8';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY, 24, 13, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Iris
+        const irisGrad = ctx.createRadialGradient(centerX, centerY, 2, centerX, centerY, 12);
+        irisGrad.addColorStop(0, '#5a3d28');
+        irisGrad.addColorStop(0.7, '#2c1a0e');
+        irisGrad.addColorStop(1, '#120a05');
+        ctx.fillStyle = irisGrad;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupil
+        ctx.fillStyle = '#050302';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Catchlight (Eye sparkle)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(centerX - 3, centerY - 3, 2.5, 0, Math.PI * 2);
+        ctx.arc(centerX + 3, centerY + 2, 1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyeliner & Lashes Upper
+        ctx.strokeStyle = '#18100c';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY - 1, 25, 14, 0, Math.PI, Math.PI * 2);
+        ctx.stroke();
+
+        // Crease
+        ctx.strokeStyle = 'rgba(120, 60, 50, 0.3)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY - 7, 22, 10, 0, Math.PI + 0.2, Math.PI * 2 - 0.2);
+        ctx.stroke();
+      };
+
+      drawEye(W / 2 - 50, H / 2 - 35);
+      drawEye(W / 2 + 50, H / 2 - 35);
+
+      // Eyebrows
+      const drawEyebrow = (startX, startY, isLeft) => {
+        ctx.strokeStyle = '#2b1b12';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(startX + (isLeft ? 25 : -25), startY - 12, startX + (isLeft ? 55 : -55), startY + 2);
+        ctx.stroke();
+      };
+
+      drawEyebrow(W / 2 - 80, H / 2 - 60, true);
+      drawEyebrow(W / 2 + 80, H / 2 - 60, false);
+
+      // Lips
+      const lipX = W / 2;
+      const lipY = H / 2 + 62;
+
+      // Lip Base Gradient
+      const lipGrad = ctx.createLinearGradient(lipX - 35, lipY, lipX + 35, lipY);
+      lipGrad.addColorStop(0, '#c25866');
+      lipGrad.addColorStop(0.5, '#d96b79');
+      lipGrad.addColorStop(1, '#be5260');
+
+      // Upper Lip
+      ctx.fillStyle = lipGrad;
+      ctx.beginPath();
+      ctx.moveTo(lipX - 35, lipY);
+      ctx.quadraticCurveTo(lipX - 18, lipY - 14, lipX, lipY - 6);
+      ctx.quadraticCurveTo(lipX + 18, lipY - 14, lipX + 35, lipY);
+      ctx.quadraticCurveTo(lipX, lipY + 4, lipX - 35, lipY);
+      ctx.fill();
+
+      // Lower Lip
+      ctx.beginPath();
+      ctx.moveTo(lipX - 35, lipY);
+      ctx.quadraticCurveTo(lipX, lipY + 22, lipX + 35, lipY);
+      ctx.quadraticCurveTo(lipX, lipY + 4, lipX - 35, lipY);
+      ctx.fill();
+
+      // Lip Gloss Highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.ellipse(lipX, lipY + 10, 12, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Front Hair Strands & Framing
+      ctx.fillStyle = '#231710';
+
+      // Left Bangs/Strands
+      ctx.beginPath();
+      ctx.moveTo(W / 2 - 110, H / 2 - 130);
+      ctx.quadraticCurveTo(W / 2 - 50, H / 2 - 130, W / 2 - 85, H / 2 - 70);
+      ctx.quadraticCurveTo(W / 2 - 125, H / 2 - 20, W / 2 - 130, H / 2 + 100);
+      ctx.quadraticCurveTo(W / 2 - 160, H / 2, W / 2 - 130, H / 2 - 120);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right Waves
+      ctx.beginPath();
+      ctx.moveTo(W / 2 + 110, H / 2 - 130);
+      ctx.quadraticCurveTo(W / 2 + 40, H / 2 - 130, W / 2 + 80, H / 2 - 60);
+      ctx.quadraticCurveTo(W / 2 + 125, H / 2 - 10, W / 2 + 135, H / 2 + 110);
+      ctx.quadraticCurveTo(W / 2 + 165, H / 2, W / 2 + 130, H / 2 - 120);
+      ctx.closePath();
+      ctx.fill();
+
+      // Hair Shading lines
+      ctx.strokeStyle = 'rgba(180, 130, 90, 0.25)';
+      ctx.lineWidth = 2;
+      for (let i = -3; i <= 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(W / 2 + i * 15, H / 2 - 160);
+        ctx.quadraticCurveTo(W / 2 - 80 + i * 10, H / 2 - 100, W / 2 - 120 + i * 5, H / 2 + 80);
+        ctx.stroke();
+      }
+
+      // If BEFORE version: Add natural facial blemishes & skin texture
+      if (!isClearVersion) {
+        // Redness patches (Rosacea/unevenness)
+        const addRedness = (cx, cy, rx, ry) => {
+          const rGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, rx);
+          rGrad.addColorStop(0, 'rgba(215, 80, 70, 0.28)');
+          rGrad.addColorStop(0.6, 'rgba(200, 70, 60, 0.12)');
+          rGrad.addColorStop(1, 'rgba(200, 70, 60, 0)');
+          ctx.fillStyle = rGrad;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+        };
+
+        // Redness on Cheeks, Forehead & Chin
+        addRedness(W / 2 - 55, H / 2 + 10, 32, 24);
+        addRedness(W / 2 + 50, H / 2 + 15, 36, 26);
+        addRedness(W / 2, H / 2 - 85, 40, 20);
+        addRedness(W / 2 - 15, H / 2 + 95, 25, 18);
+
+        // Blemishes, Spots & Hyperpigmentation
+        const blemishes = [
+          { x: W / 2 - 65, y: H / 2 + 5, r: 3.5, color: 'rgba(180, 60, 50, 0.75)' },
+          { x: W / 2 - 58, y: H / 2 + 18, r: 2.8, color: 'rgba(190, 70, 60, 0.7)' },
+          { x: W / 2 - 42, y: H / 2 + 25, r: 4.0, color: 'rgba(160, 55, 45, 0.8)' },
+          { x: W / 2 + 48, y: H / 2 + 8, r: 3.2, color: 'rgba(185, 65, 55, 0.75)' },
+          { x: W / 2 + 62, y: H / 2 + 22, r: 4.2, color: 'rgba(175, 50, 45, 0.82)' },
+          { x: W / 2 + 35, y: H / 2 + 30, r: 2.5, color: 'rgba(195, 75, 65, 0.65)' },
+          { x: W / 2 - 10, y: H / 2 - 95, r: 3.8, color: 'rgba(170, 60, 50, 0.75)' },
+          { x: W / 2 + 15, y: H / 2 - 80, r: 3.0, color: 'rgba(180, 65, 55, 0.7)' },
+          { x: W / 2 - 25, y: H / 2 - 75, r: 2.2, color: 'rgba(190, 70, 60, 0.6)' },
+          { x: W / 2 - 8, y: H / 2 + 92, r: 3.6, color: 'rgba(175, 58, 48, 0.78)' },
+          { x: W / 2 + 12, y: H / 2 + 102, r: 2.9, color: 'rgba(185, 68, 58, 0.7)' },
+        ];
+
+        blemishes.forEach(b => {
+          // Darker center spot
+          ctx.fillStyle = b.color;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Surrounding inflamed halo
+          const halo = ctx.createRadialGradient(b.x, b.y, b.r, b.x, b.y, b.r * 2.8);
+          halo.addColorStop(0, 'rgba(220, 90, 80, 0.35)');
+          halo.addColorStop(1, 'rgba(220, 90, 80, 0)');
+          ctx.fillStyle = halo;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r * 2.8, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Slight pore texture grain
+        ctx.fillStyle = 'rgba(110, 60, 50, 0.08)';
+        for (let i = 0; i < 180; i++) {
+          const px = W / 2 + (Math.random() - 0.5) * 160;
+          const py = H / 2 - 100 + Math.random() * 200;
+          ctx.fillRect(px, py, 1.5, 1.5);
+        }
+      }
+
+      // If CLEAR version: Add subtle radiant skin highlights & silk smoothness
+      if (isClearVersion) {
+        // High-shine cheekbone highlights
+        const drawHighlight = (hx, hy) => {
+          const hGrad = ctx.createRadialGradient(hx, hy, 1, hx, hy, 28);
+          hGrad.addColorStop(0, 'rgba(255, 245, 235, 0.55)');
+          hGrad.addColorStop(0.5, 'rgba(255, 230, 210, 0.2)');
+          hGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = hGrad;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 28, 0, Math.PI * 2);
+          ctx.fill();
+        };
+
+        drawHighlight(W / 2 - 58, H / 2 - 12);
+        drawHighlight(W / 2 + 58, H / 2 - 12);
+        drawHighlight(W / 2, H / 2 + 18); // Nose tip glow
+
+        // Ambient radiant aura around portrait
+        const aura = ctx.createRadialGradient(W / 2, H / 2 - 20, 80, W / 2, H / 2 - 20, 220);
+        aura.addColorStop(0, 'rgba(255, 215, 0, 0.12)');
+        aura.addColorStop(1, 'rgba(255, 215, 0, 0)');
+        ctx.fillStyle = aura;
+        ctx.fillRect(0, 0, W, H);
+      }
+    }
+
+    // Render both canvases
+    function renderPortraits() {
+      drawBaseWomanPortrait(ctxBefore, false);
+      drawBaseWomanPortrait(ctxAfter, true);
+    }
+
+    renderPortraits();
+
+    // --- ANIMATION SEQUENCE & PANEL TRACKING ---
+    const loginPanel = document.getElementById('login-panel');
+    const portraitCard = document.getElementById('portrait-card');
+    const sweepLine = document.getElementById('sweep-line');
+    const badgeAfter = document.getElementById('badge-after');
+
+    let animationProgress = 0; // 0 to 1
+    let animationFrameId = null;
+    let isAnimationRunning = false;
+    let isManualToggled = false;
+
+    function resetAnimationState() {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationProgress = 0;
+      isAnimationRunning = false;
+      isManualToggled = false;
+
+      loginPanel.classList.remove('settled', 'animating');
+      portraitCard.classList.remove('settled');
+      badgeAfter.classList.remove('visible');
+      sweepLine.classList.remove('active');
+
+      // Reset panel transform offscreen left
+      loginPanel.style.left = '50%';
+      loginPanel.style.transform = 'translate(-180%, 0) scale(0.95)';
+      loginPanel.style.opacity = '0';
+
+      // Reset clip path on portrait after layer
+      canvasAfter.style.clipPath = 'polygon(0 0, 0% 0, 0% 100%, 0 100%)';
+    }
+
+    function runSweepAnimation() {
+      resetAnimationState();
+      isAnimationRunning = true;
+
+      const duration = 2400; // ms sweep across portrait
+      const startTime = performance.now();
+
+      sweepLine.classList.add('active');
+      loginPanel.classList.add('animating');
+
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        animationProgress = Math.min(elapsed / duration, 1);
+
+        // Smooth cubic easing curve
+        const easeProgress = animationProgress < 0.5
+          ? 4 * animationProgress * animationProgress * animationProgress
+          : 1 - Math.pow(-2 * animationProgress + 2, 3) / 2;
+
+        // Calculate horizontal position of panel across portrait
+        // Starts offscreen left (-180%) and sweeps past center (+60%)
+        const currentTranslateX = -180 + (easeProgress * 240);
+        loginPanel.style.transform = `translate(${currentTranslateX}%, 0) scale(0.98)`;
+        loginPanel.style.opacity = Math.min(easeProgress * 2.5, 1);
+
+        // Calculate leading edge intersection with portrait card
+        const portraitRect = portraitCard.getBoundingClientRect();
+        const panelRect = loginPanel.getBoundingClientRect();
+
+        // Edge position relative to portrait width
+        if (portraitRect.width > 0) {
+          const panelTrailingX = panelRect.right;
+          let clipPercent = ((panelTrailingX - portraitRect.left) / portraitRect.width) * 100;
+          clipPercent = Math.max(0, Math.min(100, clipPercent));
+
+          // Synchronize clip path of "After" canvas layer
+          canvasAfter.style.clipPath = `polygon(0 0, ${clipPercent}% 0, ${clipPercent}% 100%, 0 100%)`;
+          sweepLine.style.left = `${clipPercent}%`;
+        }
+
+        if (animationProgress < 1) {
+          animationFrameId = requestAnimationFrame(step);
+        } else {
+          // Complete sweep, settle panel and portrait
+          finishAnimation();
+        }
+      }
+
+      // Small initial delay before sweep begins
+      setTimeout(() => {
+        animationFrameId = requestAnimationFrame(step);
+      }, 300);
+    }
+
+    function finishAnimation() {
+      isAnimationRunning = false;
+      sweepLine.classList.remove('active');
+      canvasAfter.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+      badgeAfter.classList.add('visible');
+
+      // Settle layout
+      portraitCard.classList.add('settled');
+      loginPanel.classList.remove('animating');
+      loginPanel.classList.add('settled');
+      loginPanel.style.transform = '';
+      loginPanel.style.left = '';
+      loginPanel.style.opacity = '';
+    }
+
+    // Interactive Manual Toggle Before/After
+    document.getElementById('btn-toggle-view').addEventListener('click', () => {
+      if (isAnimationRunning) return;
+      isManualToggled = !isManualToggled;
+      if (isManualToggled) {
+        canvasAfter.style.clipPath = 'polygon(0 0, 0% 0, 0% 100%, 0 100%)';
+        badgeAfter.classList.remove('visible');
+      } else {
+        canvasAfter.style.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%)';
+        badgeAfter.classList.add('visible');
+      }
+    });
+
+    // --- CURSOR, TOUCH PARALLAX 3D TILT & AMBIENT LIGHTING ---
+    const appContainer = document.getElementById('app-container');
+    const ambientBg = document.getElementById('ambient-bg');
+    const ambientGlow = document.getElementById('ambient-glow');
+
+    let mouseX = 0, mouseY = 0;
+    let targetX = 0, targetY = 0;
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      windowWidth = window.innerWidth;
+      windowHeight = window.innerHeight;
+    });
+
+    function handlePointerMove(clientX, clientY) {
+      // Normalize position from -1 to 1
+      targetX = (clientX / windowWidth - 0.5) * 2;
+      targetY = (clientY / windowHeight - 0.5) * 2;
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      handlePointerMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    });
+
+    // Smooth Lerp loop for continuous tilt physics
+    function animateParallax() {
+      // Lerp factor
+      mouseX += (targetX - mouseX) * 0.08;
+      mouseY += (targetY - mouseY) * 0.08;
+
+      // 3D Tilt calculations
+      const rotateY = mouseX * 8;  // max 8deg Y rotation
+      const rotateX = -mouseY * 8; // max 8deg X rotation
+
+      // Apply subtle 3D transform to app container
+      appContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+      // Dynamic ambient lighting movement
+      const glowX = 50 + mouseX * 25;
+      const glowY = 50 + mouseY * 25;
+      ambientGlow.style.left = `${glowX}%`;
+      ambientGlow.style.top = `${glowY}%`;
+
+      ambientBg.style.background = `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(45, 30, 55, 0.6) 0%, rgba(12, 10, 18, 0.95) 60%, var(--bg-dark) 100%)`;
+
+      requestAnimationFrame(animateParallax);
+    }
+
+    animateParallax();
+
+    // Auto start animation on load
+    window.addEventListener('load', () => {
+      runSweepAnimation();
+    });
+
+    document.getElementById('btn-replay').addEventListener('click', () => {
+      runSweepAnimation();
+    });
+  </script>
+</body>
+</html>
