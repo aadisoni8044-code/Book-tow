@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuxeStore | Premium Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       RESET & BASE STYLES
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark: #07090e;
+      --bg-card: rgba(18, 22, 33, 0.82);
+      --bg-card-border: rgba(255, 255, 255, 0.12);
+      --accent-gold: #fbbf24;
+      --accent-amber: #f59e0b;
+      --accent-orange: #f97316;
+      --accent-blue: #3b82f6;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --input-bg: rgba(255, 255, 255, 0.05);
+      --input-border: rgba(255, 255, 255, 0.15);
+      --input-focus: #f59e0b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 24px;
+      --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: var(--font-body);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* ==========================================================================
+       CANVAS & BACKGROUND SCENE
+       ========================================================================== */
+    #particles-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .scene-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at 50% 30%, #171d2d 0%, #0a0d14 60%, #050609 100%);
+    }
+
+    /* Ambient Lighting Effects */
+    .spotlight {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%);
+      filter: blur(50px);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Stylized Road */
+    .road-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(180deg, rgba(20, 24, 36, 0.9) 0%, rgba(10, 12, 18, 0.98) 100%);
+      border-top: 2px solid rgba(245, 158, 11, 0.3);
+      z-index: 3;
+      overflow: hidden;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+    }
+
+    .road-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 20px;
+    }
+
+    .road-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: repeating-linear-gradient(90deg, #f59e0b 0px, #f59e0b 40px, transparent 40px, transparent 80px);
+      opacity: 0.6;
+      transform: translateY(-50%);
+    }
+
+    /* ==========================================================================
+       TOP BAR & CONTROLS
+       ========================================================================== */
+    .top-bar {
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      right: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .brand-logo-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-amber), var(--accent-orange));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+    }
+
+    .skip-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .skip-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    }
+
+    /* ==========================================================================
+       STAGE & ANIMATED INTRO ELEMENTS
+       ========================================================================== */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Delivery Truck Styling */
+    .truck-wrapper {
+      position: absolute;
+      left: -320px;
+      bottom: 90px;
+      width: 260px;
+      height: 130px;
+      z-index: 20;
+      transition: transform 0.1s ease-out;
+    }
+
+    .truck-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 15px 10px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Truck wheel animation */
+    .wheel {
+      transform-origin: center;
+    }
+    .truck-wrapper.driving .wheel {
+      animation: spinWheel 0.4s linear infinite;
+    }
+
+    @keyframes spinWheel {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Headlight Beam */
+    .headlight-beam {
+      position: absolute;
+      right: -100px;
+      bottom: 25px;
+      width: 120px;
+      height: 60px;
+      background: linear-gradient(90deg, rgba(255, 235, 150, 0.6) 0%, rgba(255, 235, 150, 0) 100%);
+      clip-path: polygon(0 30%, 100% 0, 100% 100%, 0 70%);
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    /* Central Giant Parcel Box */
+    .central-parcel {
+      position: absolute;
+      bottom: 100px;
+      left: calc(50% - 70px);
+      width: 140px;
+      height: 120px;
+      z-index: 15;
+      perspective: 800px;
+      transform-style: preserve-3d;
+      transition: all 0.6s var(--transition-smooth);
+    }
+
+    .parcel-body {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #c28e5d, #9e6f43);
+      border-radius: 8px;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.3), 0 20px 30px rgba(0,0,0,0.5);
+      border: 2px solid #dfa773;
+    }
+
+    .parcel-tape {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 100%;
+      background: rgba(245, 158, 11, 0.85);
+      border-left: 1px dashed rgba(0,0,0,0.3);
+      border-right: 1px dashed rgba(0,0,0,0.3);
+    }
+
+    .parcel-label {
+      position: absolute;
+      top: 25px;
+      left: 15px;
+      width: 50px;
+      height: 35px;
+      background: #fff;
+      border-radius: 4px;
+      padding: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .parcel-label-bar {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+    .parcel-label-bar:nth-child(2) { width: 70%; }
+    .parcel-label-bar:nth-child(3) { width: 40%; }
+
+    /* Parcel Flaps for opening animation */
+    .parcel-flap-left, .parcel-flap-right {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 40px;
+      background: #b58252;
+      border: 1px solid #dfa773;
+      transform-origin: top;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 5;
+    }
+    .parcel-flap-left { left: 0; }
+    .parcel-flap-right { right: 0; }
+
+    .central-parcel.open .parcel-flap-left {
+      transform: rotateX(-120deg);
+    }
+    .central-parcel.open .parcel-flap-right {
+      transform: rotateX(-120deg);
+    }
+
+    .parcel-light-glow {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.9) 0%, rgba(245, 158, 11, 0.5) 40%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      filter: blur(15px);
+      z-index: 2;
+    }
+
+    .central-parcel.open .parcel-light-glow {
+      opacity: 1;
+    }
+
+    /* Scattered Boxes Container */
+    .scatter-boxes-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 18;
+    }
+
+    .scatter-box {
+      position: absolute;
+      border-radius: 6px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform-origin: center;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .scatter-box::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Collision Shockwave Ring */
+    .impact-ring {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #fbbf24;
+      border-radius: 50%;
+      transform: translate(-50%, 50%) scale(0);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 25;
+    }
+
+    .impact-ring.active {
+      animation: shockwave 0.6s ease-out forwards;
+    }
+
+    @keyframes shockwave {
+      0% {
+        transform: translate(-50%, 50%) scale(0.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, 50%) scale(8);
+        opacity: 0;
+      }
+    }
+
+    /* ==========================================================================
+       LOGIN PANEL (GMAIL / LUXE INSPIRED)
+       ========================================================================== */
+    .login-card-wrapper {
+      position: absolute;
+      z-index: 50;
+      width: 440px;
+      max-width: 90vw;
+      opacity: 0;
+      transform: translateY(120px) scale(0.3);
+      transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease, width 0.6s ease;
+      pointer-events: none;
+    }
+
+    .login-card-wrapper.emerge {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .login-card {
+      position: relative;
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--bg-card-border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(245, 158, 11, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .card-glow-border {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-gold), var(--accent-orange), transparent);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    /* Header section inside card */
+    .card-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 20px;
+      color: var(--accent-gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .card-badge-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--accent-gold);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-gold);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Google Sign-In Button */
+    .btn-google {
+      width: 100%;
+      height: 48px;
+      background: #ffffff;
+      color: #1f2937;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-google:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-google:active {
+      transform: translateY(0);
+    }
+
+    .google-icon-svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 22px;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before { margin-right: 12px; }
+    .divider::after { margin-left: 12px; }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-md);
+      padding: 0 16px;
+      padding-left: 42px;
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .form-input:focus {
+      border-color: var(--input-focus);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    }
+
+    .form-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 2;
+      pointer-events: none;
+      transition: stroke 0.25s ease;
+    }
+
+    .form-input:focus ~ .input-icon {
+      stroke: var(--accent-gold);
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .password-toggle-btn:hover {
+      color: #ffffff;
+    }
+
+    .password-toggle-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* Error Text Feedback */
+    .error-feedback {
+      font-size: 0.775rem;
+      color: #f87171;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .form-group.has-error .error-feedback {
+      display: block;
+    }
+
+    /* Links & Helpers */
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 0.85rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .remember-me input[type="checkbox"] {
+      accent-color: var(--accent-amber);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--accent-amber);
+      text-decoration: underline;
+    }
+
+    /* Primary Submit Button */
+    .btn-submit {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #07090e;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+      background: linear-gradient(135deg, #fcd34d 0%, #ea580c 100%);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* Footer Sign Up Link */
+    .card-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .signup-link {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 700;
+      margin-left: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .signup-link:hover {
+      color: var(--accent-amber);
+      text-decoration: underline;
+    }
+
+    /* Modal Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #10b981;
+      color: #ffffff;
+      padding: 14px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s var(--transition-smooth);
+    }
+
+    .toast-notification.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Modal Google notice dialog */
+    .google-notice-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 300;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .google-notice-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .google-notice-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .google-notice-overlay.active .google-notice-card {
+      transform: scale(1);
+    }
+
+    .notice-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(59, 130, 246, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .notice-close-btn {
+      margin-top: 20px;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       MEDIA QUERIES & ACCESSIBILITY
+       ========================================================================== */
+    @media (max-width: 480px) {
+      .top-bar {
+        left: 16px;
+        right: 16px;
+        top: 16px;
+      }
+      .brand-logo-header {
+        font-size: 1.25rem;
+      }
+      .brand-icon {
+        width: 34px;
+        height: 34px;
+      }
+      .login-card {
+        padding: 28px 20px;
+      }
+      .card-title {
+        font-size: 1.5rem;
+      }
+      .truck-wrapper {
+        transform: scale(0.75);
+      }
+      .central-parcel {
+        transform: scale(0.85);
+      }
+    }
+
+    /* Reduced Motion Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .truck-wrapper, .scatter-box, .impact-ring, .central-parcel {
+        animation: none !important;
+        transition: none !important;
+      }
+      .login-card-wrapper {
+        transition: none !important;
+        opacity: 1 !important;
+        transform: translateY(0) scale(1) !important;
+        pointer-events: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Particle Canvas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="scene-container">
+    <!-- Ambient Spotlight Glow -->
+    <div class="spotlight"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <a href="#" class="brand-logo-header">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm-9-1a2 2 0 0 1 4 0v1h-4V6zm9 13H5V9h14v10z"/>
+          </svg>
+        </div>
+        <span>LUXE<span style="color: var(--accent-gold);">STORE</span></span>
+      </a>
+
+      <button id="skip-btn" class="skip-btn" aria-label="Skip animation to login screen">
+        <span>Skip Animation</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="5 4 15 12 5 20 5 4"></polygon>
+          <line x1="19" y1="5" x2="19" y2="19"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Interactive Animation Stage -->
+    <main class="stage" id="stage">
+      <!-- Delivery Truck -->
+      <div id="truck" class="truck-wrapper">
+        <div class="headlight-beam"></div>
+        <svg class="truck-svg" viewBox="0 0 260 130">
+          <defs>
+            <linearGradient id="truckBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1e293b" />
+              <stop offset="100%" stop-color="#0f172a" />
+            </linearGradient>
+            <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#f59e0b" />
+              <stop offset="100%" stop-color="#f97316" />
+            </linearGradient>
+            <linearGradient id="cabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#334155" />
+              <stop offset="100%" stop-color="#1e293b" />
+            </linearGradient>
+          </defs>
+
+          <!-- Main Container Cargo Box -->
+          <rect x="10" y="20" width="160" height="80" rx="8" fill="url(#truckBody)" stroke="#334155" stroke-width="2"/>
+          <rect x="10" y="85" width="160" height="12" fill="url(#accentGrad)"/>
+
+          <!-- Logo text on truck -->
+          <text x="35" y="58" fill="#ffffff" font-family="Outfit" font-weight="800" font-size="18" letter-spacing="1">LUXE</text>
+          <text x="88" y="58" fill="#f59e0b" font-family="Outfit" font-weight="800" font-size="18" letter-spacing="1">EXPRESS</text>
+          <path d="M 35 65 L 145 65" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 2"/>
+
+          <!-- Cabin Header -->
+          <path d="M 170 45 L 210 45 L 235 70 L 235 100 L 170 100 Z" fill="url(#cabGrad)" stroke="#334155" stroke-width="2"/>
+          <!-- Cabin Window -->
+          <path d="M 180 52 L 205 52 L 222 70 L 180 70 Z" fill="#38bdf8" opacity="0.75"/>
+          <!-- Bumper & Headlight -->
+          <rect x="235" y="88" width="12" height="12" rx="2" fill="#fbbf24"/>
+          <rect x="235" y="94" width="15" height="8" rx="2" fill="#cbd5e1"/>
+
+          <!-- Wheels -->
+          <g class="wheel" id="wheel-back">
+            <circle cx="50" cy="102" r="18" fill="#0f172a" stroke="#475569" stroke-width="3"/>
+            <circle cx="50" cy="102" r="8" fill="#94a3b8"/>
+            <line x1="50" y1="84" x2="50" y2="120" stroke="#0f172a" stroke-width="2"/>
+            <line x1="32" y1="102" x2="68" y2="102" stroke="#0f172a" stroke-width="2"/>
+          </g>
+          <g class="wheel" id="wheel-front">
+            <circle cx="200" cy="102" r="18" fill="#0f172a" stroke="#475569" stroke-width="3"/>
+            <circle cx="200" cy="102" r="8" fill="#94a3b8"/>
+            <line x1="200" y1="84" x2="200" y2="120" stroke="#0f172a" stroke-width="2"/>
+            <line x1="182" y1="102" x2="218" y2="102" stroke="#0f172a" stroke-width="2"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Impact Ring Shockwave -->
+      <div id="impact-ring" class="impact-ring"></div>
+
+      <!-- Central Large Cardboard Box -->
+      <div id="central-parcel" class="central-parcel">
+        <div class="parcel-light-glow"></div>
+        <div class="parcel-body">
+          <div class="parcel-flap-left"></div>
+          <div class="parcel-flap-right"></div>
+          <div class="parcel-tape"></div>
+          <div class="parcel-label">
+            <div class="parcel-label-bar"></div>
+            <div class="parcel-label-bar"></div>
+            <div class="parcel-label-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scattered Boxes Container -->
+      <div id="scatter-container" class="scatter-boxes-container"></div>
+
+      <!-- Emerging Glowing Gmail-Inspired Login Card -->
+      <div id="login-wrapper" class="login-card-wrapper">
+        <div class="login-card">
+          <div class="card-glow-border"></div>
+
+          <div class="card-header">
+            <div class="card-badge">
+              <span class="card-badge-dot"></span>
+              Official E-Commerce Portal
+            </div>
+            <h1 class="card-title">Welcome Back</h1>
+            <p class="card-subtitle">Sign in to track orders, saved items, & exclusive luxury deals</p>
+          </div>
+
+          <!-- Official Google OAuth Button -->
+          <button type="button" class="btn-google" id="google-signin-btn">
+            <svg class="google-icon-svg" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Sign in with Google</span>
+          </button>
+
+          <div class="divider">or sign in with email</div>
+
+          <!-- Email / Password Credentials Form -->
+          <form id="login-form" novalidate>
+            <div class="form-group" id="email-group">
+              <label for="email" class="form-label">Email Address</label>
+              <div class="input-wrapper">
+                <input type="email" id="email" class="form-input" placeholder="alex.morgan@example.com" required autocomplete="email">
+                <svg class="input-icon" viewBox="0 0 24 24">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <div class="error-feedback" id="email-error">Please enter a valid email address.</div>
+            </div>
+
+            <div class="form-group" id="password-group">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="••••••••••••" required autocomplete="current-password">
+                <svg class="input-icon" viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <button type="button" class="password-toggle-btn" id="password-toggle" aria-label="Toggle password visibility">
+                  <svg id="eye-icon" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="error-feedback" id="password-error">Password must be at least 6 characters long.</div>
+            </div>
+
+            <div class="form-options">
+              <label class="remember-me">
+                <input type="checkbox" id="remember-me" checked>
+                <span>Remember me</span>
+              </label>
+              <a href="#forgot" class="forgot-link" id="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">
+              <span>Sign In to Account</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </form>
+
+          <div class="card-footer">
+            Don't have an account? <a href="#create" class="signup-link" id="signup-link">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Road overlay at bottom -->
+    <div class="road-container">
+      <div class="road-grid"></div>
+      <div class="road-line"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-notification">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toast-message">Sign in successful! Welcome back.</span>
+  </div>
+
+  <!-- Google Notice Dialog -->
+  <div id="google-notice" class="google-notice-overlay">
+    <div class="google-notice-card">
+      <div class="notice-icon">
+        <svg class="google-icon-svg" style="width:28px;height:28px;" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+      </div>
+      <h3 style="font-family: var(--font-heading); font-size:1.3rem; margin-bottom:10px;">Google OAuth Demo</h3>
+      <p style="color: var(--text-muted); font-size:0.9rem; line-height:1.5;">This simulation demonstrates official Google branding integration. In production, this redirects to Google's OAuth 2.0 authentication endpoint.</p>
+      <button type="button" class="notice-close-btn" id="notice-close-btn">Got It</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT SCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      // Canvas Floating Particles System
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      const PARTICLE_COUNT = 45;
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2.5 + 0.5;
+          this.speedX = (Math.random() - 0.5) * 0.4;
+          this.speedY = -Math.random() * 0.5 - 0.1;
+          this.opacity = Math.random() * 0.5 + 0.2;
+          this.color = Math.random() > 0.5 ? '#f59e0b' : '#38bdf8';
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.y < 0 || this.x < 0 || this.x > canvas.width) {
+            this.reset();
+            this.y = canvas.height + 10;
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.globalAlpha = this.opacity;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+          p.update();
+          p.draw();
+        }
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // Cinematic Intro Logic
+      const truck = document.getElementById('truck');
+      const impactRing = document.getElementById('impact-ring');
+      const centralParcel = document.getElementById('central-parcel');
+      const scatterContainer = document.getElementById('scatter-container');
+      const loginWrapper = document.getElementById('login-wrapper');
+      const skipBtn = document.getElementById('skip-btn');
+
+      let introTimeline = [];
+      let isSkipped = false;
+
+      // Box Data Palette for falling boxes
+      const boxPalettes = [
+        { bg: '#ef4444', tape: '#fca5a5' }, // Crimson Red
+        { bg: '#10b981', tape: '#a7f3d0' }, // Emerald Green
+        { bg: '#3b82f6', tape: '#bfdbfe' }, // Royal Blue
+        { bg: '#8b5cf6', tape: '#ddd6fe' }, // Deep Purple
+        { bg: '#f59e0b', tape: '#fef3c7' }, // Amber Gold
+        { bg: '#ec4899', tape: '#fbcfe8' }, // Vibrant Pink
+        { bg: '#06b6d4', tape: '#cffafe' }  // Bright Cyan
+      ];
+
+      // Spawn falling/spilling boxes function
+      function createScatterBoxes() {
+        scatterContainer.innerHTML = '';
+        const count = 12;
+        const screenW = window.innerWidth;
+        const screenH = window.innerHeight;
+        const startX = screenW / 2 - 80;
+        const startY = screenH - 160;
+
+        for (let i = 0; i < count; i++) {
+          const box = document.createElement('div');
+          box.className = 'scatter-box';
+          const styleIndex = i % boxPalettes.length;
+          const palette = boxPalettes[styleIndex];
+
+          const width = Math.floor(Math.random() * 25) + 32;
+          const height = Math.floor(Math.random() * 20) + 28;
+
+          box.style.width = width + 'px';
+          box.style.height = height + 'px';
+          box.style.backgroundColor = palette.bg;
+
+          // Target scatter landing coordinates
+          const isLeft = i % 2 === 0;
+          const spreadX = (Math.random() * (screenW * 0.38)) + 60;
+          const targetX = isLeft ? (screenW / 2 - spreadX) : (screenW / 2 + spreadX);
+          const targetY = screenH - 70 - (Math.random() * 35);
+          const rotation = (Math.random() - 0.5) * 120;
+
+          box.dataset.targetX = targetX;
+          box.dataset.targetY = targetY;
+          box.dataset.rotation = rotation;
+
+          box.style.left = startX + 'px';
+          box.style.top = startY + 'px';
+
+          scatterContainer.appendChild(box);
+        }
+      }
+
+      function animateScatterBoxes() {
+        const boxes = scatterContainer.children;
+        Array.from(boxes).forEach((box, idx) => {
+          const targetX = parseFloat(box.dataset.targetX);
+          const targetY = parseFloat(box.dataset.targetY);
+          const rotation = parseFloat(box.dataset.rotation);
+
+          // Delay stagger
+          setTimeout(() => {
+            if (isSkipped) return;
+            box.style.transition = 'all 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            box.style.opacity = '1';
+            box.style.left = targetX + 'px';
+            box.style.top = targetY + 'px';
+            box.style.transform = `rotate(${rotation}deg) scale(1)`;
+          }, idx * 40);
+        });
+      }
+
+      function nudgeScatterBoxesAway() {
+        const boxes = scatterContainer.children;
+        Array.from(boxes).forEach((box) => {
+          if (isSkipped) return;
+          const currentLeft = parseFloat(box.style.left);
+          const isLeft = currentLeft < window.innerWidth / 2;
+          const nudgeDist = isLeft ? -70 : 70;
+          box.style.transition = 'all 0.8s ease-out';
+          box.style.left = (currentLeft + nudgeDist) + 'px';
+          box.style.opacity = '0.6';
+        });
+      }
+
+      // Execute Intro Timeline Sequence
+      function startCinematicSequence() {
+        // Check reduced motion
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          skipAnimation();
+          return;
+        }
+
+        createScatterBoxes();
+
+        // Step 1: Truck Drives in from left to central parcel (0ms to 2400ms)
+        truck.classList.add('driving');
+        truck.style.transition = 'transform 2.4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+        const truckTargetX = (window.innerWidth / 2) - 200;
+        truck.style.transform = `translateX(${truckTargetX + 320}px)`;
+
+        introTimeline.push(setTimeout(() => {
+          if (isSkipped) return;
+
+          // Step 2: Truck bumps into central parcel (Collision! 2400ms)
+          truck.classList.remove('driving');
+          truck.style.transition = 'transform 0.15s ease-out';
+          truck.style.transform = `translateX(${truckTargetX + 290}px)`; // Bump forward slightly
+
+          // Impact recoil
+          setTimeout(() => {
+            if (isSkipped) return;
+            truck.style.transition = 'transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1)';
+            truck.style.transform = `translateX(${truckTargetX + 270}px)`; // Recoil back
+          }, 150);
+
+          // Impact shockwave
+          impactRing.classList.add('active');
+
+          // Central parcel jiggle/shake response
+          centralParcel.style.transition = 'transform 0.1s ease';
+          centralParcel.style.transform = 'scale(1.1) rotate(4deg)';
+          setTimeout(() => {
+            if (isSkipped) return;
+            centralParcel.style.transform = 'scale(1) rotate(0deg)';
+          }, 150);
+
+        }, 2400));
+
+        // Step 3: Truck Cargo Spills / Boxes Fall & Scatter (2700ms)
+        introTimeline.push(setTimeout(() => {
+          if (isSkipped) return;
+          animateScatterBoxes();
+        }, 2700));
+
+        // Step 4: Central Parcel Flaps Open with Light Glow (4200ms)
+        introTimeline.push(setTimeout(() => {
+          if (isSkipped) return;
+          centralParcel.classList.add('open');
+        }, 4200));
+
+        // Step 5: Scattered boxes slide away & Login Card Emerges from Parcel (5200ms)
+        introTimeline.push(setTimeout(() => {
+          if (isSkipped) return;
+          nudgeScatterBoxesAway();
+          loginWrapper.classList.add('emerge');
+        }, 5200));
+
+        // Step 6: Complete & Settle (6400ms)
+        introTimeline.push(setTimeout(() => {
+          if (isSkipped) return;
+          truck.style.opacity = '0.3';
+          truck.style.transition = 'opacity 1s ease';
+          centralParcel.style.opacity = '0.15';
+          centralParcel.style.transition = 'opacity 1s ease';
+        }, 6400));
+      }
+
+      function skipAnimation() {
+        isSkipped = true;
+        // Clear all timeline timers
+        introTimeline.forEach(t => clearTimeout(t));
+
+        // Immediately set final states
+        truck.classList.remove('driving');
+        const truckTargetX = (window.innerWidth / 2) - 200;
+        truck.style.transition = 'none';
+        truck.style.transform = `translateX(${truckTargetX + 270}px)`;
+        truck.style.opacity = '0.2';
+
+        centralParcel.classList.add('open');
+        centralParcel.style.transition = 'none';
+        centralParcel.style.opacity = '0.15';
+
+        scatterContainer.innerHTML = ''; // Hide or clear scatter
+
+        loginWrapper.classList.add('emerge');
+        skipBtn.style.display = 'none';
+      }
+
+      skipBtn.addEventListener('click', skipAnimation);
+
+      // Start Sequence on DOM Ready
+      window.addEventListener('load', () => {
+        startCinematicSequence();
+      });
+
+      // ==========================================================================
+      // FORM CONTROLS & VALIDATION
+      // ==========================================================================
+      const loginForm = document.getElementById('login-form');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const emailGroup = document.getElementById('email-group');
+      const passwordGroup = document.getElementById('password-group');
+      const passwordToggleBtn = document.getElementById('password-toggle');
+      const eyeIcon = document.getElementById('eye-icon');
+      const googleBtn = document.getElementById('google-signin-btn');
+      const googleNotice = document.getElementById('google-notice');
+      const noticeCloseBtn = document.getElementById('notice-close-btn');
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+
+      // Password visibility toggle
+      let isPasswordVisible = false;
+      passwordToggleBtn.addEventListener('click', () => {
+        isPasswordVisible = !isPasswordVisible;
+        passwordInput.type = isPasswordVisible ? 'text' : 'password';
+        eyeIcon.innerHTML = isPasswordVisible ? `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        ` : `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        `;
+      });
+
+      // Email Validator
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      // Input clear error on typing
+      emailInput.addEventListener('input', () => {
+        emailGroup.classList.remove('has-error');
+        emailInput.classList.remove('error');
+      });
+
+      passwordInput.addEventListener('input', () => {
+        passwordGroup.classList.remove('has-error');
+        passwordInput.classList.remove('error');
+      });
+
+      // Form submission handling
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let isValid = true;
+
+        const emailVal = emailInput.value.trim();
+        const passwordVal = passwordInput.value;
+
+        if (!emailVal || !isValidEmail(emailVal)) {
+          emailGroup.classList.add('has-error');
+          emailInput.classList.add('error');
+          isValid = false;
+        }
+
+        if (!passwordVal || passwordVal.length < 6) {
+          passwordGroup.classList.add('has-error');
+          passwordInput.classList.add('error');
+          isValid = false;
+        }
+
+        if (isValid) {
+          showToast(`Welcome back, ${emailVal.split('@')[0]}! Redirecting to store...`);
+          loginForm.reset();
+        }
+      });
+
+      // Google OAuth Modal Demo
+      googleBtn.addEventListener('click', () => {
+        googleNotice.classList.add('active');
+      });
+
+      noticeCloseBtn.addEventListener('click', () => {
+        googleNotice.classList.remove('active');
+      });
+
+      googleNotice.addEventListener('click', (e) => {
+        if (e.target === googleNotice) {
+          googleNotice.classList.remove('active');
+        }
+      });
+
+      // Links click simulation
+      document.getElementById('forgot-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('Password reset instructions sent to your email.');
+      });
+
+      document.getElementById('signup-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('Account creation portal initialized.');
+      });
+
+      // Helper Toast Trigger
+      function showToast(msg) {
+        toastMessage.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3500);
+      }
+
+    })();
+  </script>
+</body>
+</html>
