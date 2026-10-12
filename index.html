@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Assembly — Cybernetic Portal Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #030611;
+      --bg-card: rgba(10, 16, 35, 0.75);
+      --border-glow: rgba(0, 240, 255, 0.4);
+      --border-accent: rgba(124, 58, 237, 0.5);
+      --cyan-bright: #00f0ff;
+      --cyan-glow: rgba(0, 240, 255, 0.5);
+      --violet-bright: #8b5cf6;
+      --violet-glow: rgba(139, 92, 246, 0.5);
+      --pink-glow: #ec4899;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --input-bg: rgba(6, 11, 25, 0.85);
+      --font-heading: 'Orbitron', -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: var(--font-body);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+    }
+
+    /* Ambient Lighting & Background Effects */
+    .bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: 0;
+      animation: pulseGlow 10s ease-in-out infinite alternate;
+    }
+
+    .glow-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(0,0,0,0) 70%);
+      top: -100px;
+      left: -100px;
+    }
+
+    .glow-2 {
+      width: 650px;
+      height: 650px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.35) 0%, rgba(0,0,0,0) 70%);
+      bottom: -150px;
+      right: -150px;
+      animation-delay: -5s;
+    }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.35; }
+      100% { transform: scale(1.15) translate(30px, -20px); opacity: 0.6; }
+    }
+
+    /* Cyber Grid */
+    .cyber-grid {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background-image:
+        linear-gradient(to right, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: rotateX(60deg) translateZ(-200px);
+      transform-origin: center center;
+      z-index: 0;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 75%);
+    }
+
+    /* Top Corner Controls & Status */
+    .top-bar {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      pointer-events: auto;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-icon svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 8px var(--cyan-bright));
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .control-btn {
+      background: rgba(13, 22, 45, 0.7);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      color: var(--cyan-bright);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .control-btn:hover {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    .control-btn svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.5s ease;
+    }
+
+    .control-btn:hover svg {
+      transform: rotate(180deg);
+    }
+
+    /* Container for 3D Tilt */
+    .stage-container {
+      position: relative;
+      z-index: 10;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      padding: 20px;
+    }
+
+    /* Login Panel Styling */
+    .login-card {
+      width: 420px;
+      max-width: 90vw;
+      background: var(--bg-card);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 20px;
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(0, 240, 255, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.92) translateZ(-50px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s ease, box-shadow 0.5s ease;
+      pointer-events: none;
+    }
+
+    .login-card.assembled {
+      opacity: 1;
+      transform: scale(1) translateZ(0);
+      pointer-events: auto;
+    }
+
+    .login-card.assembling {
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    /* Laser Corner Accents */
+    .card-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--cyan-bright);
+      border-style: solid;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+    .corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+    .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+    .corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+    /* Animated Border Line Sweep */
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent,
+        transparent,
+        transparent,
+        var(--cyan-bright),
+        var(--violet-bright),
+        transparent
+      );
+      animation: rotateBorder 6s linear infinite;
+      z-index: -2;
+      opacity: 0.4;
+    }
+
+    .login-card::after {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      background: var(--bg-card);
+      border-radius: 19px;
+      z-index: -1;
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Card Header */
+    .card-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: var(--cyan-bright);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--cyan-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--cyan-bright);
+      animation: blink 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #fff;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+    }
+
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(243, 244, 246, 0.85);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      transition: color 0.3s ease;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 14px 13px 44px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-input::placeholder {
+      color: rgba(156, 163, 175, 0.5);
+    }
+
+    .form-input:focus {
+      border-color: var(--cyan-bright);
+      background: rgba(10, 20, 45, 0.9);
+      box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(0, 240, 255, 0.3);
+    }
+
+    .form-input:focus + .input-icon,
+    .input-wrapper:focus-within .input-icon {
+      color: var(--cyan-bright);
+      filter: drop-shadow(0 0 5px var(--cyan-bright));
+    }
+
+    /* Password Toggle Button */
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .toggle-password:hover {
+      color: var(--cyan-bright);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .toggle-password svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Options Row (Remember Me & Forgot Password) */
+    .options-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 26px;
+      font-size: 0.84rem;
+    }
+
+    .remember-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.3s ease;
+    }
+
+    .remember-container:hover {
+      color: var(--text-main);
+    }
+
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .remember-container input[type="checkbox"] {
+      display: none;
+    }
+
+    .remember-container input[type="checkbox"]:checked + .custom-checkbox {
+      background: var(--cyan-bright);
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    }
+
+    .custom-checkbox svg {
+      width: 12px;
+      height: 12px;
+      color: #030611;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .remember-container input[type="checkbox"]:checked + .custom-checkbox svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .forgot-link {
+      color: var(--violet-bright);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--cyan-bright);
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+      text-decoration: underline;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--cyan-bright) 0%, var(--violet-bright) 100%);
+      border: none;
+      border-radius: 12px;
+      color: #030611;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 25px rgba(0, 240, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(0, 240, 255, 0.55), 0 0 20px rgba(139, 92, 246, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .submit-btn:active {
+      transform: translateY(1px);
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+      );
+      transform: rotate(30deg) translateY(-100%);
+      transition: transform 0.8s ease;
+    }
+
+    .submit-btn:hover::before {
+      transform: rotate(30deg) translateY(100%);
+    }
+
+    /* Account Footer */
+    .card-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .register-link {
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .register-link:hover {
+      color: var(--cyan-bright);
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    }
+
+    /* Demo Toast Feedback Banner */
+    .toast-banner {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(10, 20, 45, 0.95);
+      border: 1px solid var(--cyan-bright);
+      backdrop-filter: blur(16px);
+      padding: 14px 28px;
+      border-radius: 30px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.35);
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .toast-banner.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      width: 22px;
+      height: 22px;
+      color: var(--cyan-bright);
+    }
+
+    /* Assembly Status Indicator Overlay */
+    .assembly-status {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      color: var(--cyan-bright);
+      text-transform: uppercase;
+      background: rgba(6, 11, 25, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      padding: 8px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 20;
+      transition: opacity 0.5s ease;
+    }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      background-color: var(--cyan-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan-bright);
+      animation: pulseFast 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseFast {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      100% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Media Queries for Responsive Design */
+    @media (max-width: 480px) {
+      .top-bar {
+        top: 16px;
+        left: 16px;
+        right: 16px;
+      }
+
+      .brand-title {
+        font-size: 0.88rem;
+      }
+
+      .control-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+      }
+
+      .login-card {
+        padding: 30px 22px;
+        border-radius: 16px;
+      }
+
+      .card-title {
+        font-size: 1.45rem;
+      }
+
+      .assembly-status {
+        bottom: 12px;
+        right: 12px;
+        font-size: 0.68rem;
+      }
+    }
+
+    /* Reduced Motion Preference */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .login-card {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .bg-canvas {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Canvas for Particles & Fragment Assembly -->
+  <canvas id="assemblyCanvas" class="bg-canvas"></canvas>
+
+  <!-- Ambient Glow & Cyber Grid -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="cyber-grid"></div>
+
+  <!-- Top Header Bar -->
+  <header class="top-bar">
+    <div class="brand-logo">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+      </div>
+      <span class="brand-title">NEXUS // CORE</span>
+    </div>
+
+    <div class="top-controls">
+      <button id="replayBtn" class="control-btn" title="Replay Digital Assembly Animation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        <span>REPLAY ASSEMBLY</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Stage Container for Interactive 3D Perspective Tilt -->
+  <main class="stage-container" id="stageContainer">
+    <div class="login-card" id="loginCard">
+
+      <!-- Tech Corners -->
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="badge-tag">
+          <span class="badge-dot"></span>
+          <span>SECURE ACCESS v4.9</span>
+        </div>
+        <h1 class="card-title">Welcome Back</h1>
+        <p class="card-subtitle">Authenticate credentials to initiate system session</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleFormSubmit(event)">
+        <!-- Email Input -->
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Identity / Email</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <input
+              type="email"
+              id="emailInput"
+              class="form-input"
+              placeholder="alex.vanguard@nexus.io"
+              required
+              autocomplete="email"
+            >
+          </div>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">Security Passcode</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input
+              type="password"
+              id="passwordInput"
+              class="form-input"
+              placeholder="••••••••••••"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" id="togglePasswordBtn" class="toggle-password" aria-label="Toggle password visibility">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options Row -->
+        <div class="options-row">
+          <label class="remember-container">
+            <input type="checkbox" id="rememberMe" checked>
+            <span class="custom-checkbox">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <span>Maintain Session</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="handleForgotClick(event)">Recover Passcode?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" id="signInBtn">
+          <span>SIGN IN TO NEXUS</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+
+      <!-- Account Footer -->
+      <div class="card-footer">
+        <span>Need core access?</span>
+        <a href="#" class="register-link" onclick="handleRegisterClick(event)">Request Access Credentials</a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Assembly Status Indicator -->
+  <div class="assembly-status" id="statusIndicator">
+    <span class="status-pulse"></span>
+    <span id="statusText">ASSEMBLING INTERFACE...</span>
+  </div>
+
+  <!-- Demo Toast Notification -->
+  <div class="toast-banner" id="toastBanner">
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toastMessage">Authentication sequence verified. Welcome, Alex Vanguard.</span>
+  </div>
+
+  <script>
+    /* Digital Assembly Engine & Interactive Logic */
+
+    const canvas = document.getElementById('assemblyCanvas');
+    const ctx = canvas.getContext('2d');
+    const loginCard = document.getElementById('loginCard');
+    const stageContainer = document.getElementById('stageContainer');
+    const replayBtn = document.getElementById('replayBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const toastBanner = document.getElementById('toastBanner');
+    const toastMessage = document.getElementById('toastMessage');
+    const statusText = document.getElementById('statusText');
+
+    let width = 0;
+    let height = 0;
+    let animationFrameId = null;
+    let fragments = [];
+    let bgParticles = [];
+    let isAssembling = true;
+    let assemblyProgress = 0; // 0 to 1
+    const ASSEMBLY_DURATION = 2000; // milliseconds
+    let startTime = null;
+
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Canvas Resize Handling
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if (!isAssembling) {
+        initBgParticles();
+      }
+    });
+    resizeCanvas();
+
+    // Geometric Fragment Class
+    class Fragment {
+      constructor(targetX, targetY, shapeType) {
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.shapeType = shapeType; // 'triangle', 'square', 'hexagon', 'particle', 'line'
+        this.size = Math.random() * 12 + 6;
+
+        // Random origin off-screen or far away in 3D space
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.max(width, height) * (0.8 + Math.random() * 0.8);
+        this.startX = width / 2 + Math.cos(angle) * distance;
+        this.startY = height / 2 + Math.sin(angle) * distance;
+
+        this.currentX = this.startX;
+        this.currentY = this.startY;
+
+        // 3D Rotations
+        this.startRotZ = (Math.random() - 0.5) * Math.PI * 8;
+        this.currentRotZ = this.startRotZ;
+
+        // Color & Aesthetics
+        const colors = [
+          '#00f0ff', // cyan
+          '#8b5cf6', // violet
+          '#3b82f6', // electric blue
+          '#ec4899', // magenta
+          '#ffffff'  // white sparkle
+        ];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.maxAlpha = Math.random() * 0.8 + 0.2;
+        this.alpha = 0;
+        this.glow = Math.random() > 0.4;
+
+        // Delay offset for staggered assembly feel
+        this.delay = Math.random() * 0.3; // 0 to 30% of total time
+      }
+
+      update(rawProgress) {
+        let p = (rawProgress - this.delay) / (1 - this.delay);
+        p = Math.max(0, Math.min(1, p));
+
+        // Smooth cubic easing
+        const ease = 1 - Math.pow(1 - p, 4);
+
+        this.currentX = this.startX + (this.targetX - this.startX) * ease;
+        this.currentY = this.startY + (this.targetY - this.startY) * ease;
+        this.currentRotZ = this.startRotZ * (1 - ease);
+
+        // Alpha fades in as fragments move in, and fades out near final lock-in
+        if (rawProgress < 0.8) {
+          this.alpha = this.maxAlpha * Math.min(1, ease * 1.5);
+        } else {
+          // Fade out fragments cleanly as panel locks into place
+          const fadeOut = (1 - rawProgress) / 0.2;
+          this.alpha = this.maxAlpha * fadeOut;
+        }
+      }
+
+      draw(context) {
+        if (this.alpha <= 0) return;
+
+        context.save();
+        context.translate(this.currentX, this.currentY);
+        context.rotate(this.currentRotZ);
+
+        context.globalAlpha = this.alpha;
+
+        if (this.glow) {
+          context.shadowColor = this.color;
+          context.shadowBlur = 10;
+        }
+
+        context.fillStyle = this.color;
+        context.strokeStyle = this.color;
+        context.lineWidth = 1.5;
+
+        context.beginPath();
+        if (this.shapeType === 'triangle') {
+          context.moveTo(0, -this.size);
+          context.lineTo(this.size * 0.866, this.size * 0.5);
+          context.lineTo(-this.size * 0.866, this.size * 0.5);
+          context.closePath();
+          if (Math.random() > 0.5) context.fill(); else context.stroke();
+        } else if (this.shapeType === 'square') {
+          context.rect(-this.size / 2, -this.size / 2, this.size, this.size);
+          if (Math.random() > 0.5) context.fill(); else context.stroke();
+        } else if (this.shapeType === 'hexagon') {
+          for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3;
+            const x = Math.cos(angle) * (this.size * 0.8);
+            const y = Math.sin(angle) * (this.size * 0.8);
+            if (i === 0) context.moveTo(x, y);
+            else context.lineTo(x, y);
+          }
+          context.closePath();
+          context.stroke();
+        } else if (this.shapeType === 'line') {
+          context.moveTo(-this.size, 0);
+          context.lineTo(this.size, 0);
+          context.stroke();
+        } else {
+          // Particle / Orb
+          context.arc(0, 0, this.size * 0.4, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.restore();
+      }
+    }
+
+    // Background Particle Class (for subtle ambient float)
+    class AmbientParticle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2.5 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.alpha = Math.random() * 0.6 + 0.2;
+        this.color = Math.random() > 0.5 ? '#00f0ff' : '#8b5cf6';
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+          this.reset();
+        }
+      }
+
+      draw(context) {
+        context.save();
+        context.globalAlpha = this.alpha;
+        context.fillStyle = this.color;
+        context.shadowColor = this.color;
+        context.shadowBlur = 8;
+        context.beginPath();
+        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      }
+    }
+
+    // Initialize Background Particles
+    function initBgParticles() {
+      bgParticles = [];
+      const count = Math.floor((width * height) / 12000);
+      for (let i = 0; i < Math.min(count, 100); i++) {
+        bgParticles.push(new AmbientParticle());
+      }
+    }
+
+    // Generate Assembly Fragments targeted around the login card perimeter & grid
+    function createAssemblyFragments() {
+      fragments = [];
+      const cardRect = loginCard.getBoundingClientRect();
+      const numFragments = 220; // Hundreds of fragments
+      const shapes = ['triangle', 'square', 'hexagon', 'particle', 'line'];
+
+      for (let i = 0; i < numFragments; i++) {
+        let targetX, targetY;
+        if (Math.random() < 0.6) {
+          // Perimeter edge points
+          const side = Math.floor(Math.random() * 4);
+          if (side === 0) { // Top
+            targetX = cardRect.left + Math.random() * cardRect.width;
+            targetY = cardRect.top + (Math.random() - 0.5) * 20;
+          } else if (side === 1) { // Right
+            targetX = cardRect.right + (Math.random() - 0.5) * 20;
+            targetY = cardRect.top + Math.random() * cardRect.height;
+          } else if (side === 2) { // Bottom
+            targetX = cardRect.left + Math.random() * cardRect.width;
+            targetY = cardRect.bottom + (Math.random() - 0.5) * 20;
+          } else { // Left
+            targetX = cardRect.left + (Math.random() - 0.5) * 20;
+            targetY = cardRect.top + Math.random() * cardRect.height;
+          }
+        } else {
+          // Inside panel surface grid points
+          targetX = cardRect.left + Math.random() * cardRect.width;
+          targetY = cardRect.top + Math.random() * cardRect.height;
+        }
+
+        const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+        fragments.push(new Fragment(targetX, targetY, shapeType));
+      }
+    }
+
+    // Animation Loop
+    function animate(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Render Ambient Background Particles
+      for (let particle of bgParticles) {
+        particle.update();
+        particle.draw(ctx);
+      }
+
+      if (isAssembling) {
+        assemblyProgress = Math.min(1, elapsed / ASSEMBLY_DURATION);
+
+        // Transition login card opacity in sync with assembly
+        if (assemblyProgress > 0.5) {
+          loginCard.style.opacity = (assemblyProgress - 0.5) * 2;
+        } else {
+          loginCard.style.opacity = 0;
+        }
+
+        // Draw laser connecting energy lines during assembly
+        if (assemblyProgress > 0.2 && assemblyProgress < 0.85) {
+          ctx.save();
+          ctx.strokeStyle = `rgba(0, 240, 255, ${0.15 * (1 - assemblyProgress)})`;
+          ctx.lineWidth = 1;
+          for (let i = 0; i < fragments.length; i += 6) {
+            const f1 = fragments[i];
+            const f2 = fragments[(i + 1) % fragments.length];
+            ctx.beginPath();
+            ctx.moveTo(f1.currentX, f1.currentY);
+            ctx.lineTo(f2.currentX, f2.currentY);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        // Update and draw each geometric fragment
+        for (let fragment of fragments) {
+          fragment.update(assemblyProgress);
+          fragment.draw(ctx);
+        }
+
+        if (assemblyProgress >= 1) {
+          isAssembling = false;
+          loginCard.style.opacity = '';
+          loginCard.classList.remove('assembling');
+          loginCard.classList.add('assembled');
+          statusText.textContent = 'INTERFACE STABILIZED';
+          setTimeout(() => {
+            document.getElementById('statusIndicator').style.opacity = '0.5';
+          }, 1500);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // Start Digital Assembly Process
+    function startAssemblySequence() {
+      if (prefersReducedMotion) {
+        loginCard.classList.add('assembled');
+        statusText.textContent = 'INTERFACE READY';
+        return;
+      }
+
+      isAssembling = true;
+      assemblyProgress = 0;
+      startTime = null;
+      loginCard.style.opacity = '0';
+      loginCard.classList.remove('assembled');
+      loginCard.classList.add('assembling');
+      document.getElementById('statusIndicator').style.opacity = '1';
+      statusText.textContent = 'ASSEMBLING INTERFACE...';
+
+      createAssemblyFragments();
+      initBgParticles();
+
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // Replay Button Trigger
+    replayBtn.addEventListener('click', () => {
+      startAssemblySequence();
+    });
+
+    // Password Visibility Toggle
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+
+      if (isPassword) {
+        eyeIcon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+        togglePasswordBtn.setAttribute('aria-label', 'Hide password');
+      } else {
+        eyeIcon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        `;
+        togglePasswordBtn.setAttribute('aria-label', 'Show password');
+      }
+    });
+
+    // 3D Perspective Tilt Effect on Mouse Move
+    document.addEventListener('mousemove', (e) => {
+      if (prefersReducedMotion || !loginCard.classList.contains('assembled')) return;
+
+      const xAxis = (window.innerWidth / 2 - e.pageX) / 35;
+      const yAxis = (window.innerHeight / 2 - e.pageY) / 35;
+
+      stageContainer.style.transform = `rotateY(${-xAxis}deg) rotateX(${yAxis}deg)`;
+    });
+
+    // Reset tilt on mouse leave
+    document.addEventListener('mouseleave', () => {
+      stageContainer.style.transform = `rotateY(0deg) rotateX(0deg)`;
+    });
+
+    // Form Submission Handling
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('emailInput').value || 'User';
+
+      showToast(`Access granted. Welcome to Nexus Core, ${email.split('@')[0]}!`);
+    }
+
+    function handleForgotClick(e) {
+      e.preventDefault();
+      showToast('Passcode recovery link dispatched to primary comms line.');
+    }
+
+    function handleRegisterClick(e) {
+      e.preventDefault();
+      showToast('Registration portal initializing... Stand by for clearance.');
+    }
+
+    // Toast Notification helper
+    let toastTimeout = null;
+    function showToast(message) {
+      toastMessage.textContent = message;
+      toastBanner.classList.add('show');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toastBanner.classList.remove('show');
+      }, 4000);
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        startAssemblySequence();
+      }, 100);
+    });
+  </script>
+</body>
+</html>
