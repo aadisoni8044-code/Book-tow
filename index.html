@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gmail Spatial — Modern Futuristic Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       RESET & ROOT VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-dark: #07090e;
+      --bg-surface: rgba(18, 22, 36, 0.65);
+      --bg-surface-elevated: rgba(28, 34, 54, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-border-glow: rgba(66, 133, 244, 0.4);
+      --glass-highlight: rgba(255, 255, 255, 0.08);
+
+      --google-blue: #4285F4;
+      --google-red: #EA4335;
+      --google-yellow: #FBBC05;
+      --google-green: #34A853;
+
+      --text-primary: #F0F4F8;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --accent-glow: rgba(66, 133, 244, 0.25);
+      --accent-glow-strong: rgba(66, 133, 244, 0.5);
+      --danger-color: #EF4444;
+      --success-color: #10B981;
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+
+      --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Helvetica Neue", sans-serif;
+      --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-medium: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ==========================================================================
+       BACKGROUND & CANVAS ANIMATION
+       ========================================================================== */
+    .viewport-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      overflow: hidden;
+    }
+
+    #spatial-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      z-index: 2;
+      pointer-events: none;
+      animation: floatGlow 12s infinite alternate ease-in-out;
+    }
+
+    .glow-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--google-blue), transparent 70%);
+      top: -100px;
+      left: -100px;
+    }
+
+    .glow-2 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.35), transparent 70%);
+      bottom: -150px;
+      right: -100px;
+      animation-delay: -4s;
+    }
+
+    .glow-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--google-red), transparent 70%);
+      top: 40%;
+      left: 60%;
+      opacity: 0.15;
+      animation-delay: -8s;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, 30px) scale(1.1); }
+      100% { transform: translate(-30px, 50px) scale(0.95); }
+    }
+
+    /* Spatial Grid Mesh Overlay */
+    .spatial-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       MACOS SPATIAL CONTAINER (3D TILT CARD)
+       ========================================================================== */
+    .spatial-card-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      padding: 20px;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+    }
+
+    .spatial-card {
+      position: relative;
+      background: var(--bg-surface);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.56),
+        0 18px 36px -18px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 var(--glass-highlight),
+        0 0 40px rgba(66, 133, 244, 0.08);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .spatial-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.02) 40%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+
+    /* macOS Title Bar Header */
+    .macos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      user-select: none;
+    }
+
+    .traffic-lights {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      position: relative;
+      cursor: pointer;
+      transition: transform var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .light:hover {
+      transform: scale(1.15);
+      filter: brightness(1.2);
+    }
+
+    .light-red { background-color: #FF5F56; border: 1px solid #E0443E; }
+    .light-yellow { background-color: #FFBD2E; border: 1px solid #DEA123; }
+    .light-green { background-color: #27C93F; border: 1px solid #1AAB29; }
+
+    .header-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      color: var(--text-secondary);
+    }
+
+    .header-badge .dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--google-blue);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--google-blue);
+    }
+
+    /* Card Content Area */
+    .card-body {
+      padding: 32px 36px 36px;
+      position: relative;
+    }
+
+    /* Logo & Header Title */
+    .brand-section {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .spatial-logo-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      transform: translateZ(20px);
+    }
+
+    .spatial-logo-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-md);
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(66, 133, 244, 0.6), rgba(234, 67, 53, 0.6), rgba(251, 188, 5, 0.6), rgba(52, 168, 83, 0.6));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.5;
+    }
+
+    .gmail-icon-svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Dynamic Notice Banner */
+    .demo-notice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(66, 133, 244, 0.08);
+      border: 1px solid rgba(66, 133, 244, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: #A5C7FE;
+      line-height: 1.4;
+    }
+
+    .demo-notice svg {
+      flex-shrink: 0;
+      color: var(--google-blue);
+    }
+
+    /* ==========================================================================
+       FORM STYLES & VIEWS
+       ========================================================================== */
+    .view-container {
+      position: relative;
+    }
+
+    .form-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      transition: opacity var(--transition-medium), transform var(--transition-medium);
+    }
+
+    .form-view.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .form-input.has-icon-right {
+      padding-right: 48px;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-input:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .form-input:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--google-blue);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25);
+    }
+
+    .form-input.error {
+      border-color: var(--danger-color);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+
+    /* Error Message Badge */
+    .error-text {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #F87171;
+      margin-top: 6px;
+    }
+
+    .error-text.show {
+      display: flex;
+    }
+
+    /* Password Toggle Icon */
+    .input-action-btn {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .input-action-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Options Row: Remember Me & Forgot Link */
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      color: var(--text-secondary);
+    }
+
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .remember-me input {
+      display: none;
+    }
+
+    .remember-me input:checked + .custom-checkbox {
+      background: var(--google-blue);
+      border-color: var(--google-blue);
+      box-shadow: 0 0 10px rgba(66, 133, 244, 0.4);
+    }
+
+    .custom-checkbox svg {
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all var(--transition-fast);
+    }
+
+    .remember-me input:checked + .custom-checkbox svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .forgot-link, .text-link {
+      color: var(--google-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color var(--transition-fast), text-shadow var(--transition-fast);
+    }
+
+    .forgot-link:hover, .text-link:hover {
+      color: #60A5FA;
+      text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #4285F4 0%, #2B6CB0 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px -4px rgba(66, 133, 244, 0.4);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+      transform: scale(0);
+      transition: transform 0.5s ease-out;
+      pointer-events: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 25px -4px rgba(66, 133, 244, 0.55);
+      filter: brightness(1.08);
+    }
+
+    .btn-primary:hover::before {
+      transform: scale(1);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px -2px rgba(66, 133, 244, 0.4);
+    }
+
+    .btn-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-primary.loading .btn-text {
+      display: none;
+    }
+
+    .btn-primary.loading .btn-spinner {
+      display: block;
+    }
+
+    /* Account Quick Selector Card (Step 1 -> Step 2 transition) */
+    .account-badge-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--google-blue), #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: #FFFFFF;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .account-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .account-email {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .account-status {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .change-acc-btn {
+      background: none;
+      border: none;
+      color: var(--google-blue);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .change-acc-btn:hover {
+      background: rgba(66, 133, 244, 0.15);
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 24px 0;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+
+    /* ==========================================================================
+       BRAND LOGO SOCIAL LOGIN SECTION
+       ========================================================================== */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .social-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-btn:active {
+      transform: translateY(0);
+    }
+
+    .social-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ==========================================================================
+       FOOTER LINKS & CREATION SWITCH
+       ========================================================================== */
+    .card-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       DEMO WORKSPACE LOGGED-IN VIEW
+       ========================================================================== */
+    .workspace-view {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .workspace-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(10, 185, 129, 0.3);
+      border-radius: 20px;
+      color: #34D399;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .inbox-summary {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .inbox-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .inbox-item:last-child {
+      border-bottom: none;
+    }
+
+    .inbox-item-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .inbox-item-time {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Floating Spatial HUD Accent Elements */
+    .spatial-hud-tag {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      background: rgba(18, 22, 36, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      transform: translateZ(30px);
+      animation: floatWidget 6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes floatWidget {
+      0% { transform: translateZ(30px) translateY(0px); }
+      100% { transform: translateZ(30px) translateY(-8px); }
+    }
+
+    /* ==========================================================================
+       RESPONSIVE DESIGN
+       ========================================================================== */
+    @media (max-width: 520px) {
+      .spatial-card-wrapper {
+        padding: 12px;
+      }
+
+      .card-body {
+        padding: 24px 20px 28px;
+      }
+
+      .brand-title {
+        font-size: 20px;
+      }
+
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .spatial-hud-tag {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewport-container" id="viewport">
+    <!-- Ambient Background Lighting -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- Spatial Grid Canvas -->
+    <div class="spatial-grid"></div>
+    <canvas id="spatial-canvas"></canvas>
+
+    <!-- Main Spatial Window / Glass Card -->
+    <div class="spatial-card-wrapper" id="card-wrapper">
+
+      <!-- Floating Spatial HUD Badge -->
+      <div class="spatial-hud-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>Spatial Workspace v3.4</span>
+      </div>
+
+      <div class="spatial-card">
+        <!-- macOS Window Title Bar -->
+        <div class="macos-header">
+          <div class="traffic-lights">
+            <div class="light light-red" title="Close"></div>
+            <div class="light light-yellow" title="Minimize"></div>
+            <div class="light light-green" title="Expand"></div>
+          </div>
+          <div class="header-badge">
+            <span class="dot"></span>
+            <span>Google Accounts</span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Logo & Header -->
+          <div class="brand-section">
+            <div class="spatial-logo-wrapper">
+              <!-- Animated Gmail SVG Icon -->
+              <svg class="gmail-icon-svg" viewBox="0 0 48 48" fill="none">
+                <path d="M42 12V36C42 38.2091 40.2091 40 38 40H34V18.7838L24 26.2838L14 18.7838V40H10C7.79086 40 6 38.2091 6 36V12C6 9.79086 7.79086 8 10 8H12.4286L24 16.68L35.5714 8H38C40.2091 8 42 9.79086 42 12Z" fill="#4285F4"/>
+                <path d="M6 12C6 9.79086 7.79086 8 10 8H12.4286L24 16.68L14 24.18V40H10C7.79086 40 6 38.2091 6 36V12Z" fill="#34A853"/>
+                <path d="M42 12V36C42 38.2091 40.2091 40 38 40H34V24.18L24 16.68L35.5714 8H38C40.2091 8 42 9.79086 42 12Z" fill="#EA4335"/>
+                <path d="M34 18.7838V40H38C40.2091 40 42 38.2091 42 36V12C42 10.9238 41.5739 9.94632 40.8808 9.22729L34 18.7838Z" fill="#FBBC05"/>
+              </svg>
+            </div>
+            <h1 class="brand-title" id="view-title">Welcome Back</h1>
+            <p class="brand-subtitle" id="view-subtitle">Sign in to access your Spatial Gmail workspace</p>
+          </div>
+
+          <!-- Demo Safety Notice Banner -->
+          <div class="demo-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span><strong>Demo Mode:</strong> Interactive prototype. Credentials are validated locally and never transmitted.</span>
+          </div>
+
+          <div class="view-container">
+            <!-- ================= STEP 1: EMAIL VIEW ================= -->
+            <div class="form-view active" id="view-step1">
+              <form id="form-step1" onsubmit="handleEmailSubmit(event)" novalidate>
+                <div class="form-group">
+                  <div class="form-label">
+                    <span>Email or Phone</span>
+                    <a href="#" class="text-link" onclick="handleForgotEmail(event)">Forgot email?</a>
+                  </div>
+                  <div class="input-wrapper">
+                    <input type="email" id="email-input" class="form-input" placeholder="alex.design@gmail.com" autocomplete="username">
+                  </div>
+                  <div class="error-text" id="email-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span id="email-error-msg">Please enter a valid Gmail or Google Workspace email.</span>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-next">
+                  <span class="btn-text">Next Step</span>
+                  <div class="btn-spinner"></div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </form>
+
+              <div class="divider">
+                <span>or continue with</span>
+              </div>
+
+              <!-- Brand Logos Social Login Section -->
+              <div class="social-grid">
+                <!-- Google -->
+                <button class="social-btn" onclick="handleSocialLogin('Google')" title="Sign in with Google">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                  </svg>
+                  <span>Google</span>
+                </button>
+
+                <!-- GitHub -->
+                <button class="social-btn" onclick="handleSocialLogin('GitHub')" title="Sign in with GitHub">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                  </svg>
+                  <span>GitHub</span>
+                </button>
+
+                <!-- X (Twitter) -->
+                <button class="social-btn" onclick="handleSocialLogin('X')" title="Sign in with X">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  <span>X</span>
+                </button>
+              </div>
+
+              <div class="card-footer">
+                Don't have an account? <a href="#" class="text-link" onclick="switchView('view-signup')">Create account</a>
+              </div>
+            </div>
+
+            <!-- ================= STEP 2: PASSWORD VIEW ================= -->
+            <div class="form-view" id="view-step2">
+              <div class="account-badge-card">
+                <div class="account-info">
+                  <div class="avatar-circle" id="selected-avatar-initial">A</div>
+                  <div class="account-text">
+                    <span class="account-email" id="selected-email-display">alex.design@gmail.com</span>
+                    <span class="account-status">Google Account</span>
+                  </div>
+                </div>
+                <button class="change-acc-btn" onclick="switchView('view-step1')">Change</button>
+              </div>
+
+              <form id="form-step2" onsubmit="handlePasswordSubmit(event)" novalidate>
+                <div class="form-group">
+                  <div class="form-label">
+                    <span>Enter Password</span>
+                  </div>
+                  <div class="input-wrapper">
+                    <input type="password" id="password-input" class="form-input has-icon-right" placeholder="••••••••••••" autocomplete="current-password">
+                    <button type="button" class="input-action-btn" id="toggle-password" onclick="togglePasswordVisibility()" title="Toggle password visibility">
+                      <!-- Eye Icon -->
+                      <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      <!-- Eye Off Icon -->
+                      <svg id="eye-off-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    </button>
+                  </div>
+                  <div class="error-text" id="password-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span id="password-error-msg">Password cannot be empty (min 6 characters).</span>
+                  </div>
+                </div>
+
+                <div class="form-options">
+                  <label class="remember-me">
+                    <input type="checkbox" id="remember-checkbox" checked>
+                    <span class="custom-checkbox">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                    <span>Stay signed in</span>
+                  </label>
+                  <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-login">
+                  <span class="btn-text">Sign In</span>
+                  <div class="btn-spinner"></div>
+                </button>
+              </form>
+
+              <div class="card-footer">
+                <a href="#" class="text-link" onclick="switchView('view-step1')">← Back to account selection</a>
+              </div>
+            </div>
+
+            <!-- ================= CREATE ACCOUNT VIEW ================= -->
+            <div class="form-view" id="view-signup">
+              <form id="form-signup" onsubmit="handleSignupSubmit(event)" novalidate>
+                <div class="form-group">
+                  <div class="form-label"><span>Full Name</span></div>
+                  <input type="text" id="signup-name" class="form-input" placeholder="Alex Rivers">
+                </div>
+
+                <div class="form-group">
+                  <div class="form-label"><span>Desired Gmail Address</span></div>
+                  <input type="email" id="signup-email" class="form-input" placeholder="alex.rivers@gmail.com">
+                  <div class="error-text" id="signup-error">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span>Please enter a valid username and email format.</span>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btn-signup">
+                  <span class="btn-text">Create Spatial Account</span>
+                  <div class="btn-spinner"></div>
+                </button>
+              </form>
+
+              <div class="card-footer">
+                Already have an account? <a href="#" class="text-link" onclick="switchView('view-step1')">Sign in</a>
+              </div>
+            </div>
+
+            <!-- ================= DEMO WORKSPACE LOGGED IN VIEW ================= -->
+            <div class="form-view" id="view-workspace">
+              <div class="workspace-view">
+                <div class="workspace-badge">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  <span>Authenticated Session Active</span>
+                </div>
+
+                <h2 style="font-size:18px; margin-bottom: 6px;">Welcome, <span id="logged-user-name">Alex</span>!</h2>
+                <p style="font-size:13px; color: var(--text-secondary);">Your Gmail Spatial Workspace is loaded.</p>
+
+                <div class="inbox-summary">
+                  <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px;">Recent Priority Messages (3)</div>
+                  <div class="inbox-item">
+                    <span class="inbox-item-title">🚀 Spatial Interface v3.4 Update Released</span>
+                    <span class="inbox-item-time">10:42 AM</span>
+                  </div>
+                  <div class="inbox-item">
+                    <span class="inbox-item-title">⚡ Google Cloud: Security Verification Passed</span>
+                    <span class="inbox-item-time">Yesterday</span>
+                  </div>
+                  <div class="inbox-item">
+                    <span class="inbox-item-title">🎨 Design Review: macOS Glassmorphism Spec</span>
+                    <span class="inbox-item-time">Oct 24</span>
+                  </div>
+                </div>
+
+                <button class="btn-primary" onclick="handleLogout()" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);">
+                  <span class="btn-text">Sign Out of Spatial Demo</span>
+                </button>
+              </div>
+            </div>
+
+          </div> <!-- /.view-container -->
+        </div> <!-- /.card-body -->
+      </div> <!-- /.spatial-card -->
+    </div> <!-- /.spatial-card-wrapper -->
+  </div> <!-- /.viewport-container -->
+
+  <!-- ==========================================================================
+       JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    /* ==========================================
+       STATE & DOM ELEMENTS
+       ========================================== */
+    let currentEmail = '';
+    let isPasswordVisible = false;
+
+    const cardWrapper = document.getElementById('card-wrapper');
+    const viewport = document.getElementById('viewport');
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+    const emailErrorMsg = document.getElementById('email-error-msg');
+    const passwordErrorMsg = document.getElementById('password-error-msg');
+
+    /* ==========================================
+       PARTICLE CANVAS EFFECT
+       ========================================== */
+    const canvas = document.getElementById('spatial-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.fillStyle = `rgba(148, 163, 184, ${this.alpha})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      resizeCanvas();
+      particles = [];
+      const particleCount = Math.min(Math.floor(window.innerWidth / 15), 80);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    initParticles();
+    animateParticles();
+
+    /* ==========================================
+       3D CARD PARALLAX TILT EFFECT
+       ========================================== */
+    let tiltTargetX = 0;
+    let tiltTargetY = 0;
+    let tiltCurrentX = 0;
+    let tiltCurrentY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      const { innerWidth, innerHeight } = window;
+      const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+      const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+
+      // Max tilt angle ~ 12 degrees
+      tiltTargetX = -y * 12;
+      tiltTargetY = x * 12;
+    });
+
+    function smoothTiltAnimation() {
+      tiltCurrentX += (tiltTargetX - tiltCurrentX) * 0.1;
+      tiltCurrentY += (tiltTargetY - tiltCurrentY) * 0.1;
+
+      cardWrapper.style.transform = `rotateX(${tiltCurrentX}deg) rotateY(${tiltCurrentY}deg)`;
+      requestAnimationFrame(smoothTiltAnimation);
+    }
+
+    smoothTiltAnimation();
+
+    /* ==========================================
+       VIEW SWITCHING LOGIC
+       ========================================== */
+    function switchView(viewId) {
+      const views = document.querySelectorAll('.form-view');
+      const title = document.getElementById('view-title');
+      const subtitle = document.getElementById('view-subtitle');
+
+      views.forEach(v => {
+        v.classList.remove('active');
+      });
+
+      const targetView = document.getElementById(viewId);
+      if (targetView) {
+        setTimeout(() => {
+          targetView.classList.add('active');
+        }, 150);
+      }
+
+      // Update titles based on active view
+      if (viewId === 'view-step1') {
+        title.textContent = 'Welcome Back';
+        subtitle.textContent = 'Sign in to access your Spatial Gmail workspace';
+      } else if (viewId === 'view-step2') {
+        title.textContent = 'Enter Password';
+        subtitle.textContent = 'Welcome back! Enter your password to continue';
+      } else if (viewId === 'view-signup') {
+        title.textContent = 'Create Account';
+        subtitle.textContent = 'Get started with Google Spatial Workspace';
+      } else if (viewId === 'view-workspace') {
+        title.textContent = 'Spatial Inbox';
+        subtitle.textContent = 'Authenticated Demo Dashboard';
+      }
+    }
+
+    /* ==========================================
+       FORM VALIDATION & HANDLERS
+       ========================================== */
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function handleEmailSubmit(e) {
+      e.preventDefault();
+      const val = emailInput.value.trim();
+      emailInput.classList.remove('error');
+      emailError.classList.remove('show');
+
+      if (!val) {
+        emailInput.classList.add('error');
+        emailErrorMsg.textContent = 'Please enter an email address or phone number.';
+        emailError.classList.add('show');
+        return;
+      }
+
+      if (!validateEmail(val)) {
+        emailInput.classList.add('error');
+        emailErrorMsg.textContent = 'Enter a valid email address (e.g. user@gmail.com).';
+        emailError.classList.add('show');
+        return;
+      }
+
+      // Trigger button loading state
+      const btn = document.getElementById('btn-next');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        currentEmail = val;
+
+        // Update Step 2 account badge
+        document.getElementById('selected-email-display').textContent = currentEmail;
+        document.getElementById('selected-avatar-initial').textContent = currentEmail.charAt(0).toUpperCase();
+
+        switchView('view-step2');
+      }, 600);
+    }
+
+    function handlePasswordSubmit(e) {
+      e.preventDefault();
+      const val = passwordInput.value;
+      passwordInput.classList.remove('error');
+      passwordError.classList.remove('show');
+
+      if (!val || val.length < 6) {
+        passwordInput.classList.add('error');
+        passwordErrorMsg.textContent = 'Password must be at least 6 characters long.';
+        passwordError.classList.add('show');
+        return;
+      }
+
+      const btn = document.getElementById('btn-login');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        btn.classList.remove('loading');
+
+        // Update Logged in user display
+        const userName = currentEmail.split('@')[0] || 'User';
+        document.getElementById('logged-user-name').textContent = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+        switchView('view-workspace');
+      }, 800);
+    }
+
+    function handleSignupSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const errBox = document.getElementById('signup-error');
+
+      errBox.classList.remove('show');
+
+      if (!name || !email || !validateEmail(email)) {
+        errBox.classList.add('show');
+        return;
+      }
+
+      const btn = document.getElementById('btn-signup');
+      btn.classList.add('loading');
+
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        currentEmail = email;
+        document.getElementById('logged-user-name').textContent = name;
+        switchView('view-workspace');
+      }, 800);
+    }
+
+    function togglePasswordVisibility() {
+      isPasswordVisible = !isPasswordVisible;
+      const eyeIcon = document.getElementById('eye-icon');
+      const eyeOffIcon = document.getElementById('eye-off-icon');
+
+      if (isPasswordVisible) {
+        passwordInput.type = 'text';
+        eyeIcon.style.display = 'none';
+        eyeOffIcon.style.display = 'block';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.style.display = 'block';
+        eyeOffIcon.style.display = 'none';
+      }
+    }
+
+    function handleSocialLogin(provider) {
+      alert(`Demo Social Login initiated with ${provider}. In production, this redirects to ${provider} OAuth authorization.`);
+    }
+
+    function handleForgotEmail(e) {
+      e.preventDefault();
+      alert('Demo Flow: Enter your recovery phone or backup email address to recover your Gmail account.');
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      alert('Demo Flow: A password reset link has been dispatched to your backup email.');
+    }
+
+    function handleLogout() {
+      emailInput.value = '';
+      passwordInput.value = '';
+      switchView('view-step1');
+    }
+  </script>
+</body>
+</html>
