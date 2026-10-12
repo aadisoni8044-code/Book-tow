@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gmail - Spatial UI macOS Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mac-bg: #0a0c10;
+      --glass-bg: rgba(18, 24, 38, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-hover: rgba(255, 255, 255, 0.08);
+      --glass-glow: rgba(66, 133, 244, 0.25);
+      --google-blue: #4285F4;
+      --google-red: #EA4335;
+      --google-yellow: #FBBC05;
+      --google-green: #34A853;
+      --text-main: #f0f4f8;
+      --text-sub: #94a3b8;
+      --mac-traffic-close: #ff5f56;
+      --mac-traffic-min: #ffbd2e;
+      --mac-traffic-max: #27c93f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      background-color: var(--mac-bg);
+      color: var(--text-main);
+    }
+
+    /* Background Video & Particle Canvas Layer */
+    .bg-video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .bg-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.45) contrast(1.1) saturate(1.2) blur(1px);
+      transform: scale(1.05);
+      transition: filter 0.5s ease;
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(10, 12, 16, 0.2) 0%, rgba(10, 12, 16, 0.85) 100%);
+      z-index: 2;
+    }
+
+    #particle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* macOS Top Menu Bar */
+    .mac-menubar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 32px;
+      background: rgba(15, 20, 30, 0.7);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 100;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .menubar-left, .menubar-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .apple-icon {
+      width: 15px;
+      height: 15px;
+      fill: #ffffff;
+      cursor: pointer;
+      opacity: 0.9;
+    }
+
+    .apple-icon:hover { opacity: 1; }
+
+    .menu-item {
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.85);
+      transition: color 0.2s;
+    }
+
+    .menu-item:hover {
+      color: #ffffff;
+    }
+
+    .menu-item.app-title {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .status-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .status-icon:hover { opacity: 1; }
+
+    /* Spatial Stage & Main App Container */
+    .spatial-stage {
+      position: relative;
+      z-index: 10;
+      width: 100vw;
+      height: calc(100vh - 32px);
+      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+      padding: 20px;
+    }
+
+    /* macOS Glass Window Wrapper */
+    .mac-window {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(16, 22, 34, 0.65);
+      backdrop-filter: blur(40px) saturate(200%);
+      -webkit-backdrop-filter: blur(40px) saturate(200%);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(66, 133, 244, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mac-window::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.1), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* macOS Titlebar */
+    .mac-titlebar {
+      height: 42px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .traffic-lights {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .traffic-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .traffic-btn:hover { transform: scale(1.1); }
+    .traffic-close { background-color: var(--mac-traffic-close); border: 0.5px solid rgba(0,0,0,0.2); }
+    .traffic-min { background-color: var(--mac-traffic-min); border: 0.5px solid rgba(0,0,0,0.2); }
+    .traffic-max { background-color: var(--mac-traffic-max); border: 0.5px solid rgba(0,0,0,0.2); }
+
+    .window-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .window-title-badge {
+      background: rgba(66, 133, 244, 0.2);
+      color: #60a5fa;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    /* Window Body & Login Form */
+    .mac-window-body {
+      padding: 32px 36px 36px 36px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header Section */
+    .login-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .google-spatial-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .google-spatial-logo::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(66,133,244,0.4), rgba(234,67,53,0.2), rgba(52,168,83,0.3));
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(4px);
+    }
+
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* Step Indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .step-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .step-dot.active {
+      background: var(--google-blue);
+      width: 16px;
+      border-radius: 10px;
+    }
+
+    /* Social Login Buttons */
+    .social-logins {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-btn:active {
+      transform: translateY(0);
+    }
+
+    .social-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+
+    /* Form Styles */
+    .form-step {
+      display: none;
+      animation: fadeInStep 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .form-step.active {
+      display: block;
+    }
+
+    @keyframes fadeInStep {
+      from {
+        opacity: 0;
+        transform: translateX(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 50px;
+      background: rgba(10, 15, 26, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 16px 16px 4px 16px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+
+    .input-field:focus {
+      border-color: var(--google-blue);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.25), 0 0 15px rgba(66, 133, 244, 0.1);
+      background: rgba(10, 15, 26, 0.85);
+    }
+
+    .input-label {
+      position: absolute;
+      left: 16px;
+      top: 15px;
+      font-size: 14px;
+      color: var(--text-sub);
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus ~ .input-label,
+    .input-field:not(:placeholder-shown) ~ .input-label {
+      top: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--google-blue);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 15px;
+      cursor: pointer;
+      color: var(--text-sub);
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .password-toggle:hover { opacity: 1; }
+
+    .error-msg {
+      color: var(--google-red);
+      font-size: 12px;
+      margin-top: 6px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 13px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .remember-me input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .remember-me input[type="checkbox"]:checked {
+      background: var(--google-blue);
+      border-color: var(--google-blue);
+    }
+
+    .remember-me input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: -2px;
+      left: 3px;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .forgot-link {
+      color: var(--google-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+      color: #60a5fa;
+    }
+
+    .btn-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      height: 48px;
+      background: linear-gradient(135deg, #4285F4 0%, #2b6cb0 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.35);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(66, 133, 244, 0.5);
+      background: linear-gradient(135deg, #5294ff 0%, #3182ce 100%);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      height: 48px;
+      padding: 0 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--text-sub);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Spatial Video HUD Controls Floating Dock */
+    .video-hud-dock {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 24, 38, 0.75);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .video-hud-dock:hover {
+      border-color: rgba(66, 133, 244, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(66, 133, 244, 0.2);
+    }
+
+    .hud-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-badge {
+      background: rgba(54, 211, 153, 0.2);
+      color: #36d399;
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid rgba(54, 211, 153, 0.3);
+    }
+
+    .hud-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .hud-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .hud-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: scale(1.05);
+    }
+
+    .hud-btn.active {
+      color: var(--google-blue);
+      background: rgba(66, 133, 244, 0.15);
+    }
+
+    .hud-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-slider {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 70px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .hud-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .video-progress-bar {
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .video-progress-fill {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, #4285F4, #34A853);
+      border-radius: 2px;
+      transition: width 0.1s linear;
+    }
+
+    /* Success Dashboard Modal */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 12, 16, 0.85);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      animation: modalFadeIn 0.4s ease forwards;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .success-card {
+      width: 90%;
+      max-width: 540px;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 50px rgba(54, 211, 153, 0.2);
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(52, 168, 83, 0.15);
+      border: 1px solid rgba(52, 168, 83, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+      color: #34A853;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-sub {
+      color: var(--text-sub);
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .dashboard-preview {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+
+    .dash-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+
+    .dash-item:last-child { border-bottom: none; }
+
+    /* Responsive adjustments */
+    @media (max-width: 520px) {
+      .mac-window { max-width: 100%; }
+      .mac-window-body { padding: 24px 20px 28px 20px; }
+      .video-hud-dock { width: 92%; justify-content: space-around; gap: 8px; padding: 8px 12px; }
+      .hud-title, .video-progress-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambient Video & Canvas Overlay -->
+  <div class="bg-video-container">
+    <video class="bg-video" id="bg-video" autoplay loop muted playsinline poster="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='%230a0c10'/></svg>">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4" type="video/mp4" />
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+    </video>
+    <div class="bg-overlay"></div>
+    <canvas id="particle-canvas"></canvas>
+  </div>
+
+  <!-- macOS Top Menu Bar -->
+  <header class="mac-menubar">
+    <div class="menubar-left">
+      <!-- Apple Logo -->
+      <svg class="apple-icon" viewBox="0 0 170 170">
+        <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.16-1.9-14.49-6.1-3.21-2.63-7.14-7.27-11.78-13.92-6.53-9.39-11.66-19.71-15.38-30.98-3.72-11.27-5.58-22.18-5.58-32.73 0-15.22 3.92-27.42 11.76-36.6 7.84-9.18 17.65-13.88 29.43-14.1 4.58 0 9.77 1.16 15.58 3.49 5.8 2.32 9.87 3.49 12.2 3.49 2.12 0 6.27-1.22 12.45-3.65 6.18-2.43 11.25-3.57 15.22-3.41 11.01.63 20.08 4.76 27.2 12.39-10.05 6.03-14.92 14.65-14.61 25.86.32 8.89 3.72 16.29 10.21 22.21 6.49 5.92 14.12 9.25 22.88 9.99-2.33 6.99-5.46 13.89-9.39 20.7zM119.22 31.84c0-7.3 2.65-14.28 7.95-20.94 5.3-6.66 11.96-10.45 19.98-11.37.1 1.05.16 1.9.16 2.54 0 7.19-2.7 14.28-8.1 21.27-5.4 6.99-12.12 10.89-20.16 11.71-.05-.85-.12-1.92-.12-3.21z"/>
+      </svg>
+      <span class="menu-item app-title">Gmail</span>
+      <span class="menu-item">File</span>
+      <span class="menu-item">Edit</span>
+      <span class="menu-item">View</span>
+      <span class="menu-item">Spatial</span>
+      <span class="menu-item">Help</span>
+    </div>
+    <div class="menubar-right">
+      <!-- Battery Icon -->
+      <div class="status-icon" title="Battery: 98%">
+        <svg width="18" height="12" viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="17" height="10" rx="3" stroke="rgba(255,255,255,0.8)" />
+          <rect x="3" y="3" width="11" height="6" rx="1.5" fill="#34A853" />
+          <path d="M20 4.5V7.5" stroke="rgba(255,255,255,0.8)" stroke-linecap="round" />
+        </svg>
+      </div>
+      <!-- Wi-Fi Icon -->
+      <div class="status-icon" title="Wi-Fi: Connected">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+          <path d="M8 9.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5zm-3.5-2.5a4.95 4.95 0 0 1 7 0 .75.75 0 0 0 1.06-1.06 6.45 6.45 0 0 0-9.12 0 .75.75 0 0 0 1.06 1.06zm-3.5-3.5a9.92 9.92 0 0 1 14 0 .75.75 0 0 0 1.06-1.06 11.42 11.42 0 0 0-16.12 0 .75.75 0 0 0 1.06 1.06z"/>
+        </svg>
+      </div>
+      <!-- Control Center Icon -->
+      <div class="status-icon" title="Control Center">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M3 4h10a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 5h10a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 5h10a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z"/>
+        </svg>
+      </div>
+      <span class="menu-item" id="mac-clock">Wed Oct 12 10:42 AM</span>
+    </div>
+  </header>
+
+  <!-- Spatial Stage Area -->
+  <main class="spatial-stage" id="spatial-stage">
+
+    <!-- macOS Window Shell -->
+    <div class="mac-window" id="mac-window">
+      <!-- Titlebar -->
+      <div class="mac-titlebar">
+        <div class="traffic-lights">
+          <div class="traffic-btn traffic-close" title="Close"></div>
+          <div class="traffic-btn traffic-min" title="Minimize"></div>
+          <div class="traffic-btn traffic-max" title="Expand"></div>
+        </div>
+        <div class="window-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:#4285F4">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          Google Gmail Account
+          <span class="window-title-badge">Spatial 3.0</span>
+        </div>
+        <div style="width: 52px;"></div> <!-- Spacer for optical balance -->
+      </div>
+
+      <!-- Window Body / Login Card -->
+      <div class="mac-window-body">
+
+        <div class="login-header">
+          <div class="google-spatial-logo">
+            <!-- Google Multi-Color G Logo SVG -->
+            <svg width="30" height="30" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+          </div>
+          <h1 class="login-title" id="card-title">Sign in</h1>
+          <p class="login-subtitle" id="card-sub">to continue to Gmail Spatial Mail</p>
+          <div class="step-indicator">
+            <span class="step-dot active" id="dot-1"></span>
+            <span class="step-dot" id="dot-2"></span>
+          </div>
+        </div>
+
+        <!-- Quick Social Logins -->
+        <div class="social-logins" id="social-container">
+          <!-- Google Button -->
+          <button class="social-btn" title="Sign in with Google" onclick="quickLogin('Google')">
+            <svg viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            Google
+          </button>
+
+          <!-- GitHub Button -->
+          <button class="social-btn" title="Sign in with GitHub" onclick="quickLogin('GitHub')">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            GitHub
+          </button>
+
+          <!-- X (Twitter) Button -->
+          <button class="social-btn" title="Sign in with X" onclick="quickLogin('X')">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            𝕏 Log In
+          </button>
+        </div>
+
+        <div class="divider" id="divider-el">
+          <span>or email</span>
+        </div>
+
+        <!-- Form Steps -->
+        <form id="gmail-form" onsubmit="handleFormSubmit(event)">
+
+          <!-- Step 1: Identifier -->
+          <div class="form-step active" id="step-1">
+            <div class="input-group">
+              <input type="text" id="email-input" class="input-field" placeholder=" " autocomplete="email" required />
+              <label for="email-input" class="input-label">Email or phone</label>
+              <div class="error-msg" id="email-error">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                Enter a valid email or phone number
+              </div>
+            </div>
+
+            <div class="form-options">
+              <a href="#" class="forgot-link" onclick="alert('Password reset link has been dispatched to your recovery channel.'); return false;">Forgot email?</a>
+              <span style="color: var(--text-sub); font-size: 12px;">Spatial SSL Verified</span>
+            </div>
+
+            <div class="btn-actions">
+              <button type="button" class="btn-primary" onclick="goToStep2()">
+                <span>Next</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Password -->
+          <div class="form-step" id="step-2">
+            <div class="input-group">
+              <input type="password" id="password-input" class="input-field" placeholder=" " required />
+              <label for="password-input" class="input-label">Enter your password</label>
+              <span class="password-toggle" id="toggle-pw" onclick="togglePasswordVisibility()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+              </span>
+              <div class="error-msg" id="password-error">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                Password cannot be empty
+              </div>
+            </div>
+
+            <div class="form-options">
+              <label class="remember-me">
+                <input type="checkbox" checked id="remember-cb" />
+                <span>Keep me signed in</span>
+              </label>
+              <a href="#" class="forgot-link" onclick="alert('Passkey verification prompt sent to your primary device.'); return false;">Forgot password?</a>
+            </div>
+
+            <div class="btn-actions">
+              <button type="button" class="btn-secondary" onclick="goToStep1()">Back</button>
+              <button type="submit" class="btn-primary" id="submit-btn">
+                <span id="btn-text">Sign In</span>
+                <div class="spinner" id="btn-spinner"></div>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Video UI / UX Spatial HUD Floating Controller -->
+  <aside class="video-hud-dock" id="hud-dock">
+    <div class="hud-title">
+      <span>AMBience UX</span>
+      <span class="hud-badge">Spatial 60FPS</span>
+    </div>
+
+    <div class="hud-divider"></div>
+
+    <!-- Play / Pause -->
+    <button class="hud-btn" id="btn-play-pause" title="Play / Pause Ambient Video" onclick="togglePlayPause()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="icon-play-pause">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+      </svg>
+    </button>
+
+    <!-- Sound Synth Toggle -->
+    <button class="hud-btn" id="btn-synth" title="Toggle Spatial Audio Synth Ambient Sound" onclick="toggleSynthAudio()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+    </button>
+
+    <!-- Volume Control -->
+    <div class="hud-slider-container">
+      <button class="hud-btn" id="btn-mute" title="Mute Video Audio" onclick="toggleMute()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="icon-mute">
+          <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/>
+        </svg>
+      </button>
+      <input type="range" class="hud-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="changeVolume(this.value)" />
+    </div>
+
+    <!-- Video Scrubber Progress -->
+    <div class="video-progress-bar" title="Video Seek" onclick="seekVideo(event)">
+      <div class="video-progress-fill" id="video-progress"></div>
+    </div>
+
+    <!-- Preset Video Switcher -->
+    <button class="hud-btn" id="btn-video-theme" title="Switch Ambient Video Theme" onclick="switchVideoTheme()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H9l2 4H8L6 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- Success / Inbox Preview Modal -->
+  <div class="success-modal" id="success-modal">
+    <div class="success-card">
+      <div class="success-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <h2 class="success-title">Authenticated Successfully</h2>
+      <p class="success-sub" id="authenticated-user-text">Welcome back to your Spatial macOS Gmail environment.</p>
+
+      <div class="dashboard-preview">
+        <div class="dash-item">
+          <span style="color:var(--text-sub);">Account</span>
+          <strong id="dash-account">user@gmail.com</strong>
+        </div>
+        <div class="dash-item">
+          <span style="color:var(--text-sub);">Inbox Status</span>
+          <span style="color:#34A853; font-weight:600;">14 Unread • 3 Priority</span>
+        </div>
+        <div class="dash-item">
+          <span style="color:var(--text-sub);">Spatial Protection</span>
+          <span style="color:#60a5fa;">Active (VisionOS Enclave)</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="width: 100%;" onclick="closeSuccessModal()">
+        Launch Gmail Desktop Spatial UI
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // --- Clock Functionality ---
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+      document.getElementById('mac-clock').textContent = now.toLocaleString('en-US', options).replace(',', '');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- Spatial 3D Parallax Tilt Effect ---
+    const macWindow = document.getElementById('mac-window');
+    const spatialStage = document.getElementById('spatial-stage');
+
+    spatialStage.addEventListener('mousemove', (e) => {
+      const rect = spatialStage.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+
+      const rotateX = (-y / rect.height) * 12; // Max 12deg tilt
+      const rotateY = (x / rect.width) * 12;
+
+      macWindow.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(10px)`;
+    });
+
+    spatialStage.addEventListener('mouseleave', () => {
+      macWindow.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0px)';
+    });
+
+    // --- Multi-step Login Form Logic ---
+    let currentEmail = '';
+
+    function goToStep2() {
+      const emailInput = document.getElementById('email-input');
+      const emailError = document.getElementById('email-error');
+
+      if (!emailInput.value || !emailInput.value.includes('@') && emailInput.value.length < 4) {
+        emailError.style.display = 'flex';
+        emailInput.style.borderColor = 'var(--google-red)';
+        return;
+      }
+
+      emailError.style.display = 'none';
+      emailInput.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+      currentEmail = emailInput.value;
+
+      document.getElementById('step-1').classList.remove('active');
+      document.getElementById('step-2').classList.add('active');
+
+      document.getElementById('dot-1').classList.remove('active');
+      document.getElementById('dot-2').classList.add('active');
+
+      document.getElementById('card-title').textContent = 'Welcome';
+      document.getElementById('card-sub').textContent = currentEmail;
+
+      document.getElementById('social-container').style.display = 'none';
+      document.getElementById('divider-el').style.display = 'none';
+    }
+
+    function goToStep1() {
+      document.getElementById('step-2').classList.remove('active');
+      document.getElementById('step-1').classList.add('active');
+
+      document.getElementById('dot-2').classList.remove('active');
+      document.getElementById('dot-1').classList.add('active');
+
+      document.getElementById('card-title').textContent = 'Sign in';
+      document.getElementById('card-sub').textContent = 'to continue to Gmail Spatial Mail';
+
+      document.getElementById('social-container').style.display = 'grid';
+      document.getElementById('divider-el').style.display = 'flex';
+    }
+
+    function togglePasswordVisibility() {
+      const pwInput = document.getElementById('password-input');
+      pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const passwordInput = document.getElementById('password-input');
+      const passwordError = document.getElementById('password-error');
+
+      if (!passwordInput.value) {
+        passwordError.style.display = 'flex';
+        passwordInput.style.borderColor = 'var(--google-red)';
+        return;
+      }
+
+      passwordError.style.display = 'none';
+
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+
+      btnText.textContent = 'Verifying...';
+      btnSpinner.style.display = 'block';
+      submitBtn.style.pointerEvents = 'none';
+
+      setTimeout(() => {
+        btnText.textContent = 'Sign In';
+        btnSpinner.style.display = 'none';
+        submitBtn.style.pointerEvents = 'all';
+
+        showSuccessModal(currentEmail || 'alex.developer@gmail.com');
+      }, 1200);
+    }
+
+    function quickLogin(provider) {
+      showSuccessModal(`user.${provider.toLowerCase()}@gmail.com`);
+    }
+
+    function showSuccessModal(email) {
+      document.getElementById('dash-account').textContent = email;
+      document.getElementById('authenticated-user-text').textContent = `Welcome ${email}! You have authenticated with Spatial macOS Security.`;
+      document.getElementById('success-modal').style.display = 'flex';
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('success-modal').style.display = 'none';
+    }
+
+    // --- Particle Canvas Fallback / Ambient Background Animation ---
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(66, 133, 244, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 60; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // --- Video & Audio HUD Controller ---
+    const video = document.getElementById('bg-video');
+    const playPauseBtn = document.getElementById('btn-play-pause');
+    const muteBtn = document.getElementById('btn-mute');
+    const volumeSlider = document.getElementById('volume-slider');
+    const videoProgressBar = document.getElementById('video-progress');
+
+    const videoThemes = [
+      "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4",
+      "https://assets.mixkit.co/videos/preview/mixkit-stars-in-space-background-1610-large.mp4",
+      "https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4"
+    ];
+    let currentThemeIdx = 0;
+
+    function togglePlayPause() {
+      if (video.paused) {
+        video.play();
+        playPauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+      } else {
+        video.pause();
+        playPauseBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+      }
+    }
+
+    function toggleMute() {
+      video.muted = !video.muted;
+      updateMuteIcon();
+    }
+
+    function changeVolume(val) {
+      video.volume = val;
+      video.muted = val == 0;
+      updateMuteIcon();
+    }
+
+    function updateMuteIcon() {
+      if (video.muted || video.volume == 0) {
+        muteBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>`;
+      } else {
+        muteBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM3 9v6h4l5 5V4L7 9H3z"/></svg>`;
+      }
+    }
+
+    video.addEventListener('timeupdate', () => {
+      if (video.duration) {
+        const pct = (video.currentTime / video.duration) * 100;
+        videoProgressBar.style.width = pct + '%';
+      }
+    });
+
+    function seekVideo(e) {
+      const bar = e.currentTarget;
+      const rect = bar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = clickX / rect.width;
+      if (video.duration) {
+        video.currentTime = pct * video.duration;
+      }
+    }
+
+    function switchVideoTheme() {
+      currentThemeIdx = (currentThemeIdx + 1) % videoThemes.length;
+      video.src = videoThemes[currentThemeIdx];
+      video.play();
+    }
+
+    // --- Web Audio API Spatial Ambient Sound Synthesizer ---
+    let audioCtx = null;
+    let isSynthPlaying = false;
+    let synthOscillator = null;
+
+    function toggleSynthAudio() {
+      const synthBtn = document.getElementById('btn-synth');
+
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (isSynthPlaying) {
+        if (synthOscillator) synthOscillator.stop();
+        isSynthPlaying = false;
+        synthBtn.classList.remove('active');
+      } else {
+        audioCtx.resume();
+        synthOscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        synthOscillator.type = 'sine';
+        synthOscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // A3 ambient chime
+
+        // Subtle LFO frequency modulation for soothing spatial sound
+        const lfo = audioCtx.createOscillator();
+        lfo.frequency.value = 0.2; // Slow breathing rate
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 15;
+        lfo.connect(synthOscillator.frequency);
+        lfo.start();
+
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Soft volume
+
+        synthOscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        synthOscillator.start();
+        isSynthPlaying = true;
+        synthBtn.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
