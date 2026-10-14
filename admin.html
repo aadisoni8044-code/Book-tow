@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Moderation - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .pending-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      backdrop-filter: blur(12px);
+    }
+    .pending-thumb {
+      width: 200px;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      background: #0d121f;
+    }
+    @media (max-width: 768px) {
+      .pending-card { flex-direction: column; align-items: stretch; }
+      .pending-thumb { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen Admin</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="upload.html" class="nav-link">Upload</a></li>
+        <li><a href="admin.html" class="nav-link active" style="color: var(--accent-amber);">🛡️ Admin Panel</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- User account button -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section style="padding: 3rem 0 2rem; border-bottom: 1px solid var(--border-glass);">
+    <div class="container">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Moderation Dashboard</h1>
+          <p style="color: var(--text-muted); font-size: 1rem;">Review and approve pending community login screen submissions.</p>
+        </div>
+        <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
+          🛡️ Admin Mode
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pending Submissions List -->
+  <main class="container" style="padding: 3rem 1.5rem 5rem;">
+    <h2 style="color: #fff; font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem;">Pending Queue</h2>
+
+    <div id="pending-queue-list">
+      <div style="text-align: center; padding: 3rem; color: var(--text-muted);">Loading pending queue...</div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2025 LoginScreen Community Admin Console.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { initCommonUI, showToast } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonUI(authService);
+
+      async function renderPendingQueue() {
+        const listContainer = document.getElementById('pending-queue-list');
+        const pendingItems = await firestoreService.getPendingDesigns();
+
+        if (pendingItems.length === 0) {
+          listContainer.innerHTML = `
+            <div style="text-align: center; padding: 4rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+              <h3 style="color: #fff; margin-bottom: 0.5rem;">Queue Clean & Clear 🎉</h3>
+              <p style="color: var(--text-muted);">There are no pending submissions awaiting review right now.</p>
+            </div>
+          `;
+          return;
+        }
+
+        listContainer.innerHTML = pendingItems.map(item => `
+          <div class="pending-card">
+            <img src="${item.previewImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800'}" class="pending-thumb" alt="${item.title}" />
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700;">${item.title}</h3>
+                <span class="card-badge">${item.category || 'UI'}</span>
+              </div>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                ${item.description || 'No description provided.'}
+              </p>
+              <div style="font-size: 0.825rem; color: var(--text-dim);">
+                Submitted by: <strong>${item.creatorName || 'Anonymous'}</strong> • ${new Date(item.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; min-width: 140px;">
+              <a href="preview.html?id=${item.id}" class="btn btn-secondary btn-sm" target="_blank">🔍 Preview</a>
+              <button class="btn btn-accent btn-sm approve-btn" data-id="${item.id}">✅ Approve</button>
+              <button class="btn btn-secondary btn-sm reject-btn" data-id="${item.id}" style="color: var(--accent-pink); border-color: rgba(239, 68, 68, 0.3);">❌ Reject</button>
+            </div>
+          </div>
+        `).join('');
+
+        // Attach Handlers
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            await firestoreService.updateDesignStatus(id, 'approved');
+            showToast('Submission approved! Now published in explore gallery.', 'success');
+            renderPendingQueue();
+          });
+        });
+
+        document.querySelectorAll('.reject-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            await firestoreService.updateDesignStatus(id, 'rejected');
+            showToast('Submission rejected.', 'info');
+            renderPendingQueue();
+          });
+        });
+      }
+
+      renderPendingQueue();
+    });
+  </script>
+</body>
+</html>

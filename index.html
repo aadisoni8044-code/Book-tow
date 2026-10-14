@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoginScreen Community - Share, Preview & Download Login Designs</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="upload.html" class="nav-link">Upload</a></li>
+        <li><a href="creators.html" class="nav-link">Creators</a></li>
+        <li><a href="profile.html" class="nav-link">My Profile</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Dynamically injected user profile or sign-in buttons -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section style="padding: 5rem 0 3rem; text-align: center; position: relative;">
+    <div class="container">
+      <span style="display: inline-block; padding: 0.35rem 1rem; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 30px; color: #a5b4fc; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.25rem;">
+        🚀 The #1 Open Source Platform for Login Interfaces
+      </span>
+      <h1 style="font-size: 3.2rem; font-weight: 800; line-height: 1.15; color: #fff; max-width: 800px; margin: 0 auto 1.25rem; letter-spacing: -0.03em;">
+        Share & Discover Premium <span style="background: linear-gradient(135deg, #6366f1, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Login Screen Designs</span>
+      </h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 620px; margin: 0 auto 2.25rem; line-height: 1.6;">
+        Build interactive, modern, and accessible authentication UIs. Preview live designs in isolated sandboxes and download source code instantly.
+      </p>
+      <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <a href="explore.html" class="btn btn-primary btn-lg">Explore Login Screens 🔍</a>
+        <a href="upload.html" class="btn btn-secondary btn-lg">Upload Your Design 📤</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Designs Section -->
+  <section style="padding: 3rem 0;">
+    <div class="container">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff;">Recently Approved Designs</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Curated collection of community-crafted login screens</p>
+        </div>
+        <a href="explore.html" class="btn btn-secondary btn-sm">View All Gallery →</a>
+      </div>
+
+      <div id="featured-grid" class="design-grid">
+        <!-- Dynamically rendered design cards -->
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+          Loading showcase designs...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section style="padding: 4rem 0; background: rgba(18, 24, 38, 0.4); border-y: 1px solid var(--border-glass);">
+    <div class="container">
+      <div style="text-align: center; max-width: 600px; margin: 0 auto 3rem;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">How Platform Works</h2>
+        <p style="color: var(--text-muted);">Simple step-by-step workflow for creators and developers</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+        <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
+          <div style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.15); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1.25rem;">1</div>
+          <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">Create & Craft</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Design clean HTML, CSS, and JS login forms with glassmorphism, 3D effects, or minimal styles.</p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
+          <div style="width: 50px; height: 50px; background: rgba(6, 182, 212, 0.15); color: var(--secondary); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1.25rem;">2</div>
+          <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">Upload & Review</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Submit your ZIP package and preview image. Submissions enter pending review for safety check.</p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-glass);">
+          <div style="width: 50px; height: 50px; background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1.25rem;">3</div>
+          <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">Live Preview & Download</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Test designs safely in a sandboxed isolated iframe and download ready-to-use source packages.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Creators Section -->
+  <section style="padding: 4rem 0;">
+    <div class="container">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem;">
+        <div>
+          <h2 style="font-size: 1.8rem; font-weight: 700; color: #fff;">Popular Community Creators</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">Top UI designers and frontend developers in our ecosystem</p>
+        </div>
+        <a href="creators.html" class="btn btn-secondary btn-sm">All Creators →</a>
+      </div>
+
+      <div id="creators-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem;">
+        <!-- Dynamically rendered creator cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div class="brand-logo">
+            <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg></div>
+            <span>LoginScreen Community</span>
+          </div>
+          <p class="footer-brand-desc">The open platform for showcasing, testing, and downloading world-class login interface designs.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Platform</h4>
+          <ul class="footer-links">
+            <li><a href="explore.html">Explore Gallery</a></li>
+            <li><a href="upload.html">Upload Design</a></li>
+            <li><a href="creators.html">Creators Directory</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Account</h4>
+          <ul class="footer-links">
+            <li><a href="profile.html">My Profile</a></li>
+            <li><a href="admin.html">Admin Panel</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Legal & Security</h4>
+          <ul class="footer-links">
+            <li><a href="#">Sandboxed Execution</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2025 LoginScreen Community. Built with HTML, CSS, JS & Firebase.</div>
+        <div>Protected by Sandboxed Origin Isolation</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { initCommonUI } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCommonUI(authService);
+
+      // Load Featured Approved Designs
+      const featuredGrid = document.getElementById('featured-grid');
+      const designs = await firestoreService.getApprovedDesigns();
+
+      if (designs.length === 0) {
+        featuredGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+            No published login screens found yet. Be the first creator to upload a design!
+          </div>
+        `;
+      } else {
+        featuredGrid.innerHTML = designs.slice(0, 6).map(d => `
+          <div class="design-card">
+            <div class="card-preview-wrapper">
+              <img src="${d.previewImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800'}" class="card-preview-img" alt="${d.title}" />
+              <div class="card-overlay">
+                <a href="preview.html?id=${d.id}" class="btn btn-primary btn-sm">⚡ Live Preview</a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">${d.title}</h3>
+                <span class="card-badge">${d.category || 'UI'}</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-clamp: 2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                ${d.description || 'Modern responsive login screen design.'}
+              </p>
+              <div class="card-creator">
+                <div class="creator-avatar">${d.creatorAvatar || d.creatorName?.charAt(0) || 'C'}</div>
+                <a href="profile.html?uid=${d.creatorUid}" class="creator-name">${d.creatorName || 'Anonymous'}</a>
+                <div class="card-stats">
+                  <span class="stat-item">📥 ${d.downloads || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Load Popular Creators
+      const creatorsGrid = document.getElementById('creators-grid');
+      const creators = await firestoreService.getCreators();
+
+      if (creators.length === 0) {
+        creatorsGrid.innerHTML = `<div style="grid-column: 1 / -1; color: var(--text-muted);">No creator profiles registered yet.</div>`;
+      } else {
+        creatorsGrid.innerHTML = creators.slice(0, 4).map(c => `
+          <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+              ${c.avatar}
+            </div>
+            <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.2rem;">${c.displayName}</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">${c.designCount} Published Designs</p>
+            <a href="profile.html?uid=${c.uid}" class="btn btn-secondary btn-sm" style="width: 100%;">View Creator</a>
+          </div>
+        `).join('');
+      }
+    });
+  </script>
+</body>
+</html>

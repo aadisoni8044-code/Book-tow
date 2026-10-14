@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Design - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .dropzone {
+      border: 2px dashed var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      background: rgba(17, 24, 39, 0.4);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="upload.html" class="nav-link active">Upload</a></li>
+        <li><a href="creators.html" class="nav-link">Creators</a></li>
+        <li><a href="profile.html" class="nav-link">My Profile</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- User account button -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Upload Form Container -->
+  <main class="container" style="padding: 3rem 1.5rem 5rem; max-width: 800px;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-xl); padding: 2.5rem; backdrop-filter: blur(12px);">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Upload Login Screen Design</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Share your login screen with thousands of developers and designers. All submissions undergo pending review before appearing publicly.
+        </p>
+      </div>
+
+      <!-- Auth Protection Guard Warning -->
+      <div id="auth-guard-notice" style="display: none; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 1rem 1.25rem; color: #fbbf24; margin-bottom: 1.5rem;">
+        ⚠️ You must be signed in to submit designs. <button id="guard-signin-btn" style="background: none; border: none; color: #fff; text-decoration: underline; font-weight: bold; cursor: pointer;">Sign In Now</button>
+      </div>
+
+      <form id="upload-form">
+        <div class="form-group">
+          <label class="form-label">Design Title *</label>
+          <input type="text" id="upload-title" class="form-input" placeholder="e.g. CyberPulse Glassmorphism" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select id="upload-category" class="form-select" required>
+            <option value="Glassmorphism">Glassmorphism</option>
+            <option value="Minimal">Minimal</option>
+            <option value="Gradient & Animated">Gradient & Animated</option>
+            <option value="Cyberpunk / Dark">Cyberpunk / Dark</option>
+            <option value="3D & Spatial">3D & Spatial</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="upload-description" class="form-textarea" rows="3" placeholder="Briefly describe the theme, animation physics, or user experience..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tags (comma separated)</label>
+          <input type="text" id="upload-tags" class="form-input" placeholder="Glassmorphism, Dark Mode, CSS Grid, Animated" />
+        </div>
+
+        <!-- Preview Image Upload -->
+        <div class="form-group">
+          <label class="form-label">Preview Image (PNG, JPG, WebP - max 5MB) *</label>
+          <div class="dropzone" id="img-dropzone">
+            <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">🖼️</span>
+            <div id="img-drop-text" style="color: var(--text-muted); font-size: 0.9rem;">
+              Click or drag & drop a screenshot preview here
+            </div>
+            <input type="file" id="upload-img-file" accept="image/png, image/jpeg, image/webp" style="display: none;" />
+          </div>
+        </div>
+
+        <!-- Source Package / HTML Code Input -->
+        <div class="form-group">
+          <label class="form-label">Download Package (ZIP archive - max 10MB) *</label>
+          <div class="dropzone" id="zip-dropzone">
+            <span style="font-size: 2rem; display: block; margin-bottom: 0.5rem;">📦</span>
+            <div id="zip-drop-text" style="color: var(--text-muted); font-size: 0.9rem;">
+              Click or drag & drop a ZIP package (.zip containing HTML/CSS/JS)
+            </div>
+            <input type="file" id="upload-zip-file" accept=".zip,application/zip" style="display: none;" />
+          </div>
+        </div>
+
+        <!-- Embedded Interactive Preview Source Code -->
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label">HTML Code (for Sandboxed Live Preview)</label>
+          <textarea id="upload-html" class="form-textarea" rows="6" placeholder="<div class='login-card'>...</div>" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">CSS Code (optional)</label>
+          <textarea id="upload-css" class="form-textarea" rows="4" placeholder=".login-card { background: rgba(255,255,255,0.1); }"></textarea>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress-wrapper" style="display: none; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+            <span>Uploading design assets...</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+            <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.2s ease;"></div>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;">
+          Submit Design for Review 🚀
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2025 LoginScreen Community. Creator Portal.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { PreviewSandboxEngine } from './js/preview-sandbox.js';
+    import { initCommonUI, showToast } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonUI(authService);
+
+      const authGuard = document.getElementById('auth-guard-notice');
+      const submitBtn = document.getElementById('submit-btn');
+      const imgDropzone = document.getElementById('img-dropzone');
+      const imgInput = document.getElementById('upload-img-file');
+      const imgText = document.getElementById('img-drop-text');
+
+      const zipDropzone = document.getElementById('zip-dropzone');
+      const zipInput = document.getElementById('upload-zip-file');
+      const zipText = document.getElementById('zip-drop-text');
+
+      let selectedImgFile = null;
+      let selectedZipFile = null;
+
+      // Auth Check
+      authService.onAuthChange((user) => {
+        if (!user) {
+          authGuard.style.display = 'block';
+          submitBtn.disabled = true;
+          submitBtn.style.opacity = '0.5';
+        } else {
+          authGuard.style.display = 'none';
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = '1';
+        }
+      });
+
+      const guardSigninBtn = document.getElementById('guard-signin-btn');
+      if (guardSigninBtn) {
+        guardSigninBtn.addEventListener('click', () => {
+          document.getElementById('open-signin-btn')?.click();
+        });
+      }
+
+      // Drag and Drop Image Setup
+      imgDropzone.addEventListener('click', () => imgInput.click());
+      imgInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleImgFile(e.target.files[0]);
+      });
+
+      function handleImgFile(file) {
+        const val = PreviewSandboxEngine.validateUploadFile(file, ['png', 'jpg', 'jpeg', 'webp'], 5 * 1024 * 1024);
+        if (!val.valid) {
+          showToast(val.error, 'error');
+          return;
+        }
+        selectedImgFile = file;
+        imgText.innerHTML = `✅ Selected Image: <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+
+      // Drag and Drop ZIP Setup
+      zipDropzone.addEventListener('click', () => zipInput.click());
+      zipInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleZipFile(e.target.files[0]);
+      });
+
+      function handleZipFile(file) {
+        const val = PreviewSandboxEngine.validateUploadFile(file, ['zip', 'application/zip'], 10 * 1024 * 1024);
+        if (!val.valid) {
+          showToast(val.error, 'error');
+          return;
+        }
+        selectedZipFile = file;
+        zipText.innerHTML = `✅ Selected Package: <strong>${file.name}</strong> (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+      }
+
+      // Form Submission Logic
+      const form = document.getElementById('upload-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!authService.currentUser) {
+          showToast('You must be signed in to submit designs.', 'error');
+          return;
+        }
+
+        const title = document.getElementById('upload-title').value.trim();
+        const category = document.getElementById('upload-category').value;
+        const description = document.getElementById('upload-description').value.trim();
+        const tagsRaw = document.getElementById('upload-tags').value;
+        const htmlCode = document.getElementById('upload-html').value;
+        const cssCode = document.getElementById('upload-css').value;
+
+        const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+        // UI Progress simulation
+        const progressWrapper = document.getElementById('progress-wrapper');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+
+        progressWrapper.style.display = 'block';
+        submitBtn.disabled = true;
+
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 20;
+          progressBar.style.width = `${progress}%`;
+          progressPercent.textContent = `${progress}%`;
+
+          if (progress >= 100) {
+            clearInterval(interval);
+            completeSubmission();
+          }
+        }, 150);
+
+        async function completeSubmission() {
+          try {
+            // Convert preview image file to Data URL if uploaded
+            let previewImgUrl = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800';
+            if (selectedImgFile) {
+              previewImgUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(selectedImgFile);
+              });
+            }
+
+            const payload = {
+              title,
+              category,
+              description,
+              tags,
+              previewImage: previewImgUrl,
+              htmlCode,
+              cssCode,
+              jsCode: '',
+              creatorUid: authService.currentUser.uid,
+              creatorName: authService.currentUser.displayName,
+              creatorAvatar: authService.currentUser.displayName.charAt(0).toUpperCase()
+            };
+
+            await firestoreService.submitDesign(payload);
+
+            showToast('Design submitted successfully! Status: PENDING REVIEW', 'success');
+            setTimeout(() => window.location.href = 'profile.html', 1500);
+          } catch (err) {
+            showToast('Failed to submit design: ' + err.message, 'error');
+            submitBtn.disabled = false;
+            progressWrapper.style.display = 'none';
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
