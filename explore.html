@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore Login Screens - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .filter-pill {
+      padding: 0.5rem 1.1rem;
+      border-radius: 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link active">Explore</a></li>
+        <li><a href="upload.html" class="nav-link">Upload</a></li>
+        <li><a href="creators.html" class="nav-link">Creators</a></li>
+        <li><a href="profile.html" class="nav-link">My Profile</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- User avatar / Sign in -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header Section -->
+  <section style="padding: 3rem 0 1.5rem; background: rgba(18, 24, 38, 0.2); border-bottom: 1px solid var(--border-glass);">
+    <div class="container">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
+        Explore Login Screen Designs
+      </h1>
+      <p style="color: var(--text-muted); font-size: 1rem; max-width: 600px; margin-bottom: 2rem;">
+        Discover, preview, and download community-built authentication templates.
+      </p>
+
+      <!-- Search & Sorting Controls -->
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <div style="flex: 1; min-width: 280px; position: relative;">
+          <input type="text" id="search-input" class="form-input" placeholder="🔍 Search by title, tags, or creator..." style="padding-left: 2.5rem;" />
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <label style="color: var(--text-muted); font-size: 0.875rem; font-weight: 500;">Sort By:</label>
+          <select id="sort-select" class="form-select" style="width: 160px; padding: 0.65rem 0.85rem;">
+            <option value="newest">Newest First</option>
+            <option value="popular">Most Popular</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div style="display: flex; gap: 0.6rem; overflow-x: auto; padding: 1.25rem 0 0.5rem;" id="category-pills">
+        <button class="filter-pill active" data-category="All">All Categories</button>
+        <button class="filter-pill" data-category="Glassmorphism">Glassmorphism</button>
+        <button class="filter-pill" data-category="Minimal">Minimal</button>
+        <button class="filter-pill" data-category="Gradient & Animated">Gradient & Animated</button>
+        <button class="filter-pill" data-category="Cyberpunk / Dark">Cyberpunk / Dark</button>
+        <button class="filter-pill" data-category="3D & Spatial">3D & Spatial</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Grid Section -->
+  <section style="padding: 2.5rem 0 5rem;">
+    <div class="container">
+      <div id="gallery-count" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+        Showing approved designs...
+      </div>
+
+      <div id="gallery-grid" class="design-grid">
+        <!-- Dynamically rendered design cards -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2025 LoginScreen Community. Dynamic Firestore Gallery.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Module Script -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { initCommonUI } from './js/app-ui.js';
+
+    let currentFilters = {
+      search: '',
+      category: 'All',
+      sort: 'newest'
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCommonUI(authService);
+
+      const searchInput = document.getElementById('search-input');
+      const sortSelect = document.getElementById('sort-select');
+      const categoryPills = document.querySelectorAll('.filter-pill');
+
+      async function renderGallery() {
+        const galleryGrid = document.getElementById('gallery-grid');
+        const galleryCount = document.getElementById('gallery-count');
+
+        galleryGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+            Loading designs from database...
+          </div>
+        `;
+
+        const designs = await firestoreService.getApprovedDesigns(currentFilters);
+        galleryCount.textContent = `Showing ${designs.length} approved design${designs.length === 1 ? '' : 's'}`;
+
+        if (designs.length === 0) {
+          galleryGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+              <h3 style="color: #fff; margin-bottom: 0.5rem;">No Login Screens Found</h3>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Try adjusting your search keywords or category filters.</p>
+              <button id="reset-filters-btn" class="btn btn-secondary btn-sm">Reset Filters</button>
+            </div>
+          `;
+
+          const resetBtn = document.getElementById('reset-filters-btn');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              currentFilters = { search: '', category: 'All', sort: 'newest' };
+              searchInput.value = '';
+              sortSelect.value = 'newest';
+              categoryPills.forEach(p => p.classList.toggle('active', p.dataset.category === 'All'));
+              renderGallery();
+            });
+          }
+          return;
+        }
+
+        galleryGrid.innerHTML = designs.map(d => `
+          <div class="design-card">
+            <div class="card-preview-wrapper">
+              <img src="${d.previewImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800'}" class="card-preview-img" alt="${d.title}" />
+              <div class="card-overlay">
+                <a href="preview.html?id=${d.id}" class="btn btn-primary btn-sm">⚡ Live Preview</a>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h3 class="card-title">${d.title}</h3>
+                <span class="card-badge">${d.category || 'UI'}</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-clamp: 2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                ${d.description || 'Modern login screen template.'}
+              </p>
+              <div class="card-creator">
+                <div class="creator-avatar">${d.creatorAvatar || d.creatorName?.charAt(0) || 'C'}</div>
+                <a href="profile.html?uid=${d.creatorUid}" class="creator-name">${d.creatorName || 'Anonymous'}</a>
+                <div class="card-stats">
+                  <span class="stat-item">📥 ${d.downloads || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Event Listeners for Filtering
+      let searchDebounce;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => {
+          currentFilters.search = e.target.value.trim();
+          renderGallery();
+        }, 300);
+      });
+
+      sortSelect.addEventListener('change', (e) => {
+        currentFilters.sort = e.target.value;
+        renderGallery();
+      });
+
+      categoryPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          categoryPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentFilters.category = pill.dataset.category;
+          renderGallery();
+        });
+      });
+
+      // Initial Render
+      renderGallery();
+    });
+  </script>
+</body>
+</html>

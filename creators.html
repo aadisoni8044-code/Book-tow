@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creators Directory - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="upload.html" class="nav-link">Upload</a></li>
+        <li><a href="creators.html" class="nav-link active">Creators</a></li>
+        <li><a href="profile.html" class="nav-link">My Profile</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Dynamic User Nav -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section style="padding: 3rem 0 2rem; border-bottom: 1px solid var(--border-glass);">
+    <div class="container">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">Creators Directory</h1>
+      <p style="color: var(--text-muted); font-size: 1rem;">Meet the talented designers and engineers behind our community login designs.</p>
+    </div>
+  </section>
+
+  <!-- Creators Grid -->
+  <main class="container" style="padding: 3rem 1.5rem 5rem;">
+    <div id="creators-directory-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.75rem;">
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Loading creators...</div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2025 LoginScreen Community.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { initCommonUI } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCommonUI(authService);
+
+      const grid = document.getElementById('creators-directory-grid');
+      const creators = await firestoreService.getCreators();
+
+      if (creators.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+            No creators found yet. Sign up and publish your first login screen design!
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = creators.map(c => `
+        <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-xl); padding: 2rem; text-align: center; backdrop-filter: blur(12px);">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent-purple)); color: #fff; font-size: 1.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; border: 2px solid var(--border-glass);">
+            ${c.avatar}
+          </div>
+          <h3 style="color: #fff; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">${c.displayName}</h3>
+          <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+            ${c.designCount} Published Design${c.designCount === 1 ? '' : 's'} • ${c.totalDownloads} Downloads
+          </div>
+          <a href="profile.html?uid=${c.uid}" class="btn btn-secondary btn-sm" style="width: 100%;">View Public Profile</a>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>

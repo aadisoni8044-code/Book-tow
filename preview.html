@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Preview - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      background: rgba(10, 14, 23, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-glass);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 100;
+    }
+
+    .device-switcher {
+      display: flex;
+      background: rgba(18, 24, 38, 0.8);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .device-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .device-btn.active, .device-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .preview-stage {
+      flex: 1;
+      height: calc(100vh - 65px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #060911;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .frame-wrapper {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      transition: all var(--transition-smooth);
+      background: #000;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Device Presets */
+    .frame-wrapper.preset-desktop {
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-md);
+    }
+
+    .frame-wrapper.preset-tablet {
+      width: 768px;
+      height: 90%;
+      border-radius: var(--radius-lg);
+      border: 8px solid #1f2937;
+    }
+
+    .frame-wrapper.preset-mobile {
+      width: 375px;
+      height: 85%;
+      border-radius: var(--radius-xl);
+      border: 10px solid #1f2937;
+    }
+
+    iframe.sandbox-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+
+    .sandbox-badge {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 1.25rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Preview Header Bar -->
+  <header class="preview-header">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="explore.html" class="btn btn-secondary btn-sm">← Back to Gallery</a>
+      <div>
+        <h2 id="design-title" style="font-size: 1.1rem; color: #fff; font-weight: 700;">Loading Design...</h2>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          Created by <a href="#" id="creator-link" style="color: var(--primary); font-weight: 500;">...</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Device Frame Switcher -->
+    <div class="device-switcher">
+      <button class="device-btn active" data-preset="desktop">🖥️ Desktop</button>
+      <button class="device-btn" data-preset="tablet">📱 Tablet</button>
+      <button class="device-btn" data-preset="mobile">📱 Mobile</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button id="download-btn" class="btn btn-primary btn-sm">📥 Download ZIP</button>
+    </div>
+  </header>
+
+  <!-- Stage & Sandboxed Frame -->
+  <main class="preview-stage">
+    <div class="frame-wrapper preset-desktop" id="frame-wrapper">
+      <iframe id="sandbox-iframe" class="sandbox-frame" title="Sandboxed Live Login Screen Preview"></iframe>
+    </div>
+
+    <div class="sandbox-badge">
+      <span>🛡️</span>
+      <span>Isolated Origin Sandbox (CSP Restricted)</span>
+    </div>
+  </main>
+
+  <!-- Module Script -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { PreviewSandboxEngine } from './js/preview-sandbox.js';
+    import { showToast } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const designId = urlParams.get('id');
+
+      if (!designId) {
+        showToast('No design selected.', 'error');
+        setTimeout(() => window.location.href = 'explore.html', 1500);
+        return;
+      }
+
+      const design = await firestoreService.getDesignById(designId);
+
+      if (!design) {
+        showToast('Design not found.', 'error');
+        setTimeout(() => window.location.href = 'explore.html', 1500);
+        return;
+      }
+
+      // Populate Meta Details
+      document.getElementById('design-title').textContent = design.title;
+      const creatorLink = document.getElementById('creator-link');
+      creatorLink.textContent = design.creatorName || 'Anonymous';
+      creatorLink.href = `profile.html?uid=${design.creatorUid}`;
+
+      // Initialize Sandboxed Iframe
+      const iframe = document.getElementById('sandbox-iframe');
+      PreviewSandboxEngine.applySandboxRestrictions(iframe);
+
+      const blobUrl = PreviewSandboxEngine.createSafeIframeDocument(
+        design.htmlCode || '<h3>No HTML content provided</h3>',
+        design.cssCode || '',
+        design.jsCode || ''
+      );
+
+      iframe.src = blobUrl;
+
+      // Handle Device Frame Switches
+      const deviceBtns = document.querySelectorAll('.device-btn');
+      const frameWrapper = document.getElementById('frame-wrapper');
+
+      deviceBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          deviceBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const preset = btn.dataset.preset;
+          frameWrapper.className = `frame-wrapper preset-${preset}`;
+        });
+      });
+
+      // Handle Package Download
+      const downloadBtn = document.getElementById('download-btn');
+      downloadBtn.addEventListener('click', async () => {
+        try {
+          await firestoreService.incrementDownloadCount(design.id);
+          showToast(`Downloading package for "${design.title}"...`, 'success');
+
+          // Build lightweight single-file HTML or ZIP Blob for download
+          const packageBlob = new Blob([
+            `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${design.title}</title><style>${design.cssCode || ''}</style></head><body>${design.htmlCode || ''}<script>${design.jsCode || ''}<\/script></body></html>`
+          ], { type: 'text/html' });
+
+          const downloadName = `${design.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_loginscreen.html`;
+          PreviewSandboxEngine.triggerDownload(URL.createObjectURL(packageBlob), downloadName);
+        } catch (err) {
+          showToast('Failed to trigger download.', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

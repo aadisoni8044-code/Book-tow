@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Profile - LoginScreen Community</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-approved { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand-logo">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        </div>
+        <span>LoginScreen</span>
+      </a>
+
+      <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="explore.html" class="nav-link">Explore</a></li>
+        <li><a href="upload.html" class="nav-link">Upload</a></li>
+        <li><a href="creators.html" class="nav-link">Creators</a></li>
+        <li><a href="profile.html" class="nav-link active">My Profile</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Dynamic account menu -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Header Banner -->
+  <section style="padding: 3.5rem 0 2rem; background: rgba(18, 24, 38, 0.4); border-bottom: 1px solid var(--border-glass);">
+    <div class="container">
+      <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+        <div id="profile-avatar" style="width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 2.2rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border: 3px solid var(--border-glass); box-shadow: var(--shadow-glow);">
+          U
+        </div>
+
+        <div style="flex: 1;">
+          <h1 id="profile-name" style="font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem;">Creator Name</h1>
+          <p id="profile-bio" style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin-bottom: 0.75rem;">
+            Passionate designer & frontend developer crafting modern UI components.
+          </p>
+          <div style="display: flex; gap: 1.5rem; color: var(--text-muted); font-size: 0.875rem;">
+            <span>📦 <strong id="stat-published" style="color: #fff;">0</strong> Designs</span>
+            <span>📥 <strong id="stat-downloads" style="color: #fff;">0</strong> Total Downloads</span>
+          </div>
+        </div>
+
+        <button id="edit-profile-btn" class="btn btn-secondary btn-sm" style="display: none;">✏️ Edit Bio</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile Submissions Gallery -->
+  <main class="container" style="padding: 3rem 1.5rem 5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 id="gallery-heading" style="font-size: 1.5rem; font-weight: 700; color: #fff;">Published Designs</h2>
+      <a href="upload.html" class="btn btn-primary btn-sm">+ Upload New Design</a>
+    </div>
+
+    <div id="user-designs-grid" class="design-grid">
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Loading designs...</div>
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="modal-overlay">
+    <div class="modal-container">
+      <button class="modal-close" id="edit-modal-close">&times;</button>
+      <h3 style="color: #fff; margin-bottom: 1rem;">Edit Profile Information</h3>
+      <form id="edit-profile-form">
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input type="text" id="edit-name-input" class="form-input" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Biography</label>
+          <textarea id="edit-bio-input" class="form-textarea" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border: none; padding: 0;">
+        <div>&copy; 2025 LoginScreen Community. Profile Engine.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { authService } from './js/auth-service.js';
+    import { firestoreService } from './js/firestore-service.js';
+    import { initCommonUI, showToast } from './js/app-ui.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initCommonUI(authService);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetUid = urlParams.get('uid');
+
+      authService.onAuthChange(async (authUser) => {
+        const isOwnProfile = !targetUid || (authUser && authUser.uid === targetUid);
+        const effectiveUid = targetUid || authUser?.uid;
+
+        if (!effectiveUid) {
+          document.getElementById('profile-name').textContent = 'Guest Visitor';
+          document.getElementById('profile-bio').textContent = 'Sign in or select a creator to view profile details.';
+          document.getElementById('user-designs-grid').innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+              Please sign in to view your personal dashboard.
+            </div>
+          `;
+          return;
+        }
+
+        // Fetch target user metadata
+        let profileUser = authUser && authUser.uid === effectiveUid ? authUser : await authService.getUserProfile(effectiveUid);
+        if (!profileUser) {
+          profileUser = {
+            displayName: 'Community Creator',
+            bio: 'UI/UX Design Enthusiast',
+            uid: effectiveUid
+          };
+        }
+
+        document.getElementById('profile-name').textContent = profileUser.displayName || 'Creator';
+        document.getElementById('profile-bio').textContent = profileUser.bio || 'Passionate designer & developer';
+        document.getElementById('profile-avatar').textContent = (profileUser.displayName || 'C').charAt(0).toUpperCase();
+
+        const editBtn = document.getElementById('edit-profile-btn');
+        if (isOwnProfile && authUser) {
+          editBtn.style.display = 'inline-flex';
+          document.getElementById('gallery-heading').textContent = 'My Submissions Dashboard';
+        } else {
+          editBtn.style.display = 'none';
+          document.getElementById('gallery-heading').textContent = `${profileUser.displayName}'s Published Designs`;
+        }
+
+        // Fetch User Designs
+        const designs = await firestoreService.getUserDesigns(effectiveUid);
+        const approvedCount = designs.filter(d => d.status === 'approved').length;
+        const totalDownloads = designs.reduce((sum, d) => sum + (d.downloads || 0), 0);
+
+        document.getElementById('stat-published').textContent = approvedCount;
+        document.getElementById('stat-downloads').textContent = totalDownloads;
+
+        const grid = document.getElementById('user-designs-grid');
+
+        if (designs.length === 0) {
+          grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-glass);">
+              No submissions found for this profile yet.
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = designs.map(d => {
+          const statusClass = `status-${d.status || 'pending'}`;
+          return `
+            <div class="design-card">
+              <div class="card-preview-wrapper">
+                <img src="${d.previewImage || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800'}" class="card-preview-img" alt="${d.title}" />
+                <div class="card-overlay">
+                  <a href="preview.html?id=${d.id}" class="btn btn-primary btn-sm">⚡ Live Preview</a>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="card-title-row">
+                  <h3 class="card-title">${d.title}</h3>
+                  <span class="status-pill ${statusClass}">${d.status || 'pending'}</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                  ${d.description || 'Custom login screen submission.'}
+                </p>
+                <div class="card-creator">
+                  <span style="font-size: 0.8rem; color: var(--text-dim);">Category: ${d.category}</span>
+                  <div class="card-stats">
+                    <span class="stat-item">📥 ${d.downloads || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Profile Edit Modal Setup
+        const editModal = document.getElementById('edit-profile-modal');
+        const editClose = document.getElementById('edit-modal-close');
+        const editForm = document.getElementById('edit-profile-form');
+
+        editBtn.addEventListener('click', () => {
+          document.getElementById('edit-name-input').value = profileUser.displayName || '';
+          document.getElementById('edit-bio-input').value = profileUser.bio || '';
+          editModal.classList.add('active');
+        });
+
+        editClose.addEventListener('click', () => editModal.classList.remove('active'));
+
+        editForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const newName = document.getElementById('edit-name-input').value.trim();
+          const newBio = document.getElementById('edit-bio-input').value.trim();
+
+          try {
+            await authService.updateProfileData({ displayName: newName, bio: newBio });
+            showToast('Profile updated!', 'success');
+            editModal.classList.remove('active');
+            window.location.reload();
+          } catch (err) {
+            showToast('Failed to update profile: ' + err.message, 'error');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
