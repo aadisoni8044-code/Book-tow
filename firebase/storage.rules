@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email.matches('.*@admin\\.com$');
+    }
+
+    // Public preview images
+    match /previews/{designId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Downloadable template ZIP files
+    match /packages/{designId}/{fileName} {
+      allow read: if isSignedIn() || isAdmin();
+      allow write: if isSignedIn() && request.resource.size < 25 * 1024 * 1024;
+    }
+  }
+}
