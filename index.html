@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuthVault — Dribbble-Inspired Login Screen Gallery</title>
+  <meta name="description" content="Explore, test, and download thousands of modern login screens and authentication UI designs.">
+
+  <!-- FontAwesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Firebase SDK (Version 10 ESM / Compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- TOP HEADER / NAVIGATION -->
+  <header class="top-header">
+    <div class="header-container">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-logo" id="brand-logo-btn">
+        <div class="logo-icon">
+          <i class="fa-solid => fa-shield-halved" style="display:none;"></i>
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="9" fill="url(#logo-grad)"/>
+            <path d="M16 6L8 10V16C8 21.52 11.41 26.58 16 28C20.59 26.58 24 21.52 24 16V10L16 6ZM16 14.99C17.1 14.99 18 15.89 18 16.99C18 17.76 17.56 18.42 16.93 18.75V21H15.07V18.75C14.44 18.42 14 17.76 14 16.99C14 15.89 14.9 14.99 16 14.99Z" fill="white"/>
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#EA4C89"/>
+                <stop offset="1" stop-color="#8A2387"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-name">Auth<span class="brand-highlight">Vault</span></span>
+        <span class="pro-badge">GALLERY</span>
+      </a>
+
+      <!-- Global Search Bar -->
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="global-search-input" placeholder="Search 18,000+ login UI screens, glassmorphism, dark mode..." autocomplete="off">
+        <span class="search-shortcut"><kbd>⌘</kbd><kbd>K</kbd></span>
+        <button id="clear-search-btn" class="clear-search-btn hidden" aria-label="Clear search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Actions -->
+      <nav class="main-nav">
+        <button class="nav-link active" id="nav-explore-btn"><i class="fa-solid fa-compass"></i> Explore</button>
+        <button class="nav-link" id="nav-categories-btn"><i class="fa-solid fa-layer-group"></i> Categories</button>
+        <button class="nav-link" id="nav-creators-btn"><i class="fa-solid fa-users"></i> Creators</button>
+        <button class="btn btn-secondary upload-btn" id="open-upload-btn">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+          <span>Upload Design</span>
+        </button>
+        <button class="btn btn-primary signin-btn" id="auth-btn">
+          <i class="fa-solid fa-user"></i>
+          <span>Sign In</span>
+        </button>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-drawer hidden" id="mobile-drawer">
+      <div class="mobile-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="mobile-search-input" placeholder="Search login designs...">
+      </div>
+      <div class="mobile-nav-links">
+        <button class="mobile-nav-link active" id="m-explore-btn"><i class="fa-solid fa-compass"></i> Explore Designs</button>
+        <button class="mobile-nav-link" id="m-categories-btn"><i class="fa-solid fa-layer-group"></i> Categories</button>
+        <button class="mobile-nav-link" id="m-creators-btn"><i class="fa-solid fa-users"></i> Top Creators</button>
+        <button class="btn btn-secondary w-full" id="m-upload-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Design</button>
+        <button class="btn btn-primary w-full" id="m-auth-btn"><i class="fa-solid fa-user"></i> Sign In</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN HERO & HERO STATS SECTION -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        <span>Over 2,400+ Live Playable Interactive Login Screens</span>
+      </div>
+      <h1 class="hero-title">Discover top-rated <span class="gradient-text">login UI screens</span> & authentication flows</h1>
+      <p class="hero-subtitle">Explore pixel-perfect authentication interfaces created by world-class UI/UX designers. Run real-time live interactive previews and download production-ready source code.</p>
+
+      <!-- Stats bar -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="total-designs-count">18,420+</span>
+          <span class="stat-label">UI Designs</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">1,250+</span>
+          <span class="stat-label">UI Creators</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">98.4k</span>
+          <span class="stat-label">Monthly Live Runs</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLS & FILTER BAR -->
+  <section class="filter-bar-section">
+    <div class="filter-bar-container">
+
+      <!-- Scrollable Category Pills -->
+      <div class="category-scroll-container">
+        <button class="scroll-arrow left hidden" id="cat-scroll-left"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="category-pills" id="category-pills">
+          <button class="pill-btn active" data-category="all">
+            <i class="fa-solid fa-border-all"></i> All Designs
+          </button>
+          <button class="pill-btn" data-category="saas">
+            <i class="fa-solid fa-cube"></i> SaaS & Web App
+          </button>
+          <button class="pill-btn" data-category="glassmorphic">
+            <i class="fa-solid fa-glass-water"></i> Glassmorphism
+          </button>
+          <button class="pill-btn" data-category="dark">
+            <i class="fa-solid fa-moon"></i> Dark Mode
+          </button>
+          <button class="pill-btn" data-category="minimal">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Modern Minimal
+          </button>
+          <button class="pill-btn" data-category="mobile">
+            <i class="fa-solid fa-mobile-screen-button"></i> Mobile App
+          </button>
+          <button class="pill-btn" data-category="animated">
+            <i class="fa-solid fa-atom"></i> 3D & Physics
+          </button>
+          <button class="pill-btn" data-category="gradient">
+            <i class="fa-solid fa-palette"></i> Neon & Gradient
+          </button>
+          <button class="pill-btn" data-category="enterprise">
+            <i class="fa-solid fa-building"></i> Enterprise SSO
+          </button>
+        </div>
+        <button class="scroll-arrow right" id="cat-scroll-right"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+
+      <!-- Secondary Filters & Sort Options -->
+      <div class="filter-actions">
+        <!-- Sort Dropdown -->
+        <div class="custom-select-wrapper">
+          <label for="sort-select" class="sr-only">Sort By</label>
+          <i class="fa-solid fa-arrow-down-short-wide select-icon"></i>
+          <select id="sort-select" class="custom-select">
+            <option value="popular">Popular First</option>
+            <option value="latest">Latest Uploads</option>
+            <option value="likes">Most Liked</option>
+            <option value="title">Alphabetical</option>
+          </select>
+        </div>
+
+        <!-- Tech Filter Dropdown -->
+        <div class="custom-select-wrapper">
+          <label for="tech-select" class="sr-only">Technology</label>
+          <i class="fa-solid fa-code select-icon"></i>
+          <select id="tech-select" class="custom-select">
+            <option value="all">All Tech</option>
+            <option value="html">Vanilla HTML/CSS/JS</option>
+            <option value="tailwind">Tailwind CSS</option>
+            <option value="canvas">HTML5 Canvas</option>
+          </select>
+        </div>
+
+        <!-- Grid View Toggle -->
+        <div class="grid-toggle-group">
+          <button class="grid-toggle-btn active" id="view-grid-large" title="Large Grid">
+            <i class="fa-solid fa-grip-vertical"></i>
+          </button>
+          <button class="grid-toggle-btn" id="view-grid-compact" title="Compact Grid">
+            <i class="fa-solid fa-grip"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DESIGN GALLERY GRID SECTION -->
+  <main class="gallery-main">
+    <div class="gallery-container">
+
+      <!-- Gallery Results Counter & Active Filters Display -->
+      <div class="results-header">
+        <span class="results-count" id="results-count">Showing 12 designs</span>
+        <div class="active-filter-tags" id="active-filters">
+          <!-- Dynamically populated tags when search/filters are active -->
+        </div>
+      </div>
+
+      <!-- GALLERY GRID CONTAINER -->
+      <div class="gallery-grid" id="gallery-grid">
+        <!-- Dynamically injected gallery cards via JS -->
+      </div>
+
+      <!-- SKELETON LOADING STATE (shown during async fetch) -->
+      <div class="gallery-grid hidden" id="gallery-skeletons">
+        <!-- Repeated skeleton cards generated via JS or markup -->
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="empty-state hidden" id="empty-state">
+        <div class="empty-icon">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <h3>No login designs found</h3>
+        <p>We couldn't find any designs matching your search or selected filters. Try searching for different keywords like "dark mode" or "glass".</p>
+        <button class="btn btn-secondary" id="reset-filters-btn">
+          <i class="fa-solid fa-rotate-left"></i> Reset All Filters
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="#" class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="url(#logo-grad-footer)"/>
+            <path d="M16 6L8 10V16C8 21.52 11.41 26.58 16 28C20.59 26.58 24 21.52 24 16V10L16 6Z" fill="white"/>
+            <defs>
+              <linearGradient id="logo-grad-footer" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#EA4C89"/>
+                <stop offset="1" stop-color="#8A2387"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="brand-name">Auth<span class="brand-highlight">Vault</span></span>
+        </a>
+        <p class="footer-desc">The premier visual inspiration gallery and sandbox platform for modern authentication and login UI screens.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <a href="#" class="f-link" data-category="saas">SaaS Login Screens</a>
+          <a href="#" class="f-link" data-category="glassmorphic">Glassmorphic UI</a>
+          <a href="#" class="f-link" data-category="dark">Dark Theme Auth</a>
+          <a href="#" class="f-link" data-category="animated">3D & Physics Engines</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="#" id="footer-creators-link">Featured Creators</a>
+          <a href="#" id="footer-upload-link">Upload Design</a>
+          <a href="#" id="footer-firebase-status"><i class="fa-solid fa-signal text-success"></i> Firebase Live Sync</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 AuthVault. Dribbble-inspired UI/UX Gallery. Built for designers & developers.</p>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- MODALS & OVERLAYS                          -->
+  <!-- ========================================== -->
+
+  <!-- 1. DEDICATED LIVE PREVIEW MODAL -->
+  <div class="modal-overlay hidden" id="preview-modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+    <div class="modal-card preview-modal-card">
+
+      <!-- Modal Header -->
+      <div class="preview-modal-header">
+        <div class="creator-preview-meta">
+          <img src="" alt="" class="creator-avatar" id="modal-creator-avatar">
+          <div class="meta-text">
+            <h2 id="preview-title" class="preview-title">Design Title</h2>
+            <p class="preview-byline">
+              by <a href="#" class="creator-link-name" id="modal-creator-name">Creator Name</a>
+              <span class="creator-badge" id="modal-creator-badge"><i class="fa-solid fa-circle-check"></i> PRO</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Viewport Controls (Desktop / Tablet / Mobile) -->
+        <div class="viewport-controls">
+          <button class="vp-btn active" data-viewport="100%" title="Desktop View (100%)">
+            <i class="fa-solid fa-desktop"></i> <span>Desktop</span>
+          </button>
+          <button class="vp-btn" data-viewport="768px" title="Tablet View (768px)">
+            <i class="fa-solid fa-tablet-screen-button"></i> <span>Tablet</span>
+          </button>
+          <button class="vp-btn" data-viewport="375px" title="Mobile View (375px)">
+            <i class="fa-solid fa-mobile-screen-button"></i> <span>Mobile</span>
+          </button>
+          <button class="vp-btn" id="full-screen-preview-btn" title="Open Full Screen">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="modal-action-btns">
+          <button class="btn btn-like" id="modal-like-btn">
+            <i class="fa-regular fa-heart"></i>
+            <span id="modal-like-count">0</span>
+          </button>
+          <button class="btn btn-primary" id="modal-download-btn">
+            <i class="fa-solid fa-download"></i>
+            <span>Download Code</span>
+          </button>
+          <button class="modal-close-btn" id="close-preview-modal-btn" aria-label="Close modal">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Main Area (Sandboxed Live Viewport) -->
+      <div class="preview-viewport-wrapper">
+        <div class="preview-device-frame" id="preview-device-frame">
+          <div class="sandbox-loading-overlay" id="sandbox-loader">
+            <div class="spinner"></div>
+            <span>Loading Sandboxed Environment...</span>
+          </div>
+          <!-- SAFE ISOLATED SANDBOXED IFRAME -->
+          <iframe id="sandbox-iframe"
+                  sandbox="allow-scripts allow-modals allow-forms"
+                  title="Sandboxed Live Preview"
+                  class="sandbox-iframe">
+          </iframe>
+        </div>
+      </div>
+
+      <!-- Modal Footer / Details Section -->
+      <div class="preview-modal-footer">
+        <div class="modal-details-grid">
+          <div class="modal-desc-col">
+            <h3>About this design</h3>
+            <p id="preview-description" class="preview-desc-text">Design description goes here...</p>
+            <div class="tags-container" id="preview-tags">
+              <!-- Tag badges -->
+            </div>
+          </div>
+          <div class="modal-specs-col">
+            <div class="spec-item">
+              <span class="spec-label"><i class="fa-solid fa-code"></i> Framework</span>
+              <span class="spec-val" id="preview-tech">Vanilla HTML/CSS/JS</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label"><i class="fa-solid fa-layer-group"></i> Category</span>
+              <span class="spec-val" id="preview-category">Glassmorphism</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label"><i class="fa-solid fa-calendar"></i> Published</span>
+              <span class="spec-val" id="preview-date">Recently</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label"><i class="fa-solid fa-eye"></i> Views</span>
+              <span class="spec-val" id="preview-views">1,420</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Designs Section -->
+        <div class="related-designs-section">
+          <h3>More from this creator & category</h3>
+          <div class="related-grid" id="related-designs-grid">
+            <!-- Small related design cards -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- 2. UPLOAD DESIGN MODAL -->
+  <div class="modal-overlay hidden" id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="upload-title">
+    <div class="modal-card upload-modal-card">
+      <div class="modal-card-header">
+        <div>
+          <h2 id="upload-title"><i class="fa-solid fa-cloud-arrow-up text-accent"></i> Upload Login Screen Design</h2>
+          <p class="modal-subtitle">Share your authentication UI design with thousands of creators in the community.</p>
+        </div>
+        <button class="modal-close-btn" id="close-upload-modal-btn" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="upload-form" class="upload-form">
+        <div class="form-grid">
+
+          <div class="form-group col-span-2">
+            <label for="upload-design-title">Design Title <span class="required">*</span></label>
+            <input type="text" id="upload-design-title" required placeholder="e.g. Cyberpunk Holographic Auth Screen">
+          </div>
+
+          <div class="form-group">
+            <label for="upload-creator-name">Creator Name <span class="required">*</span></label>
+            <input type="text" id="upload-creator-name" required placeholder="e.g. Sarah Jenkins">
+          </div>
+
+          <div class="form-group">
+            <label for="upload-category">Category <span class="required">*</span></label>
+            <select id="upload-category" required class="custom-select">
+              <option value="saas">SaaS & Web App</option>
+              <option value="glassmorphic">Glassmorphism</option>
+              <option value="dark">Dark Mode</option>
+              <option value="minimal">Modern Minimal</option>
+              <option value="mobile">Mobile App</option>
+              <option value="animated">3D & Physics</option>
+              <option value="gradient">Neon & Gradient</option>
+            </select>
+          </div>
+
+          <div class="form-group col-span-2">
+            <label for="upload-description">Description</label>
+            <textarea id="upload-description" rows="2" placeholder="Brief explanation of your design, key features, animations..."></textarea>
+          </div>
+
+          <div class="form-group col-span-2">
+            <label for="upload-tags">Tags (comma separated)</label>
+            <input type="text" id="upload-tags" placeholder="e.g. glassmorphism, dark-mode, animated, tailwind">
+          </div>
+
+          <!-- Code / Markup Input -->
+          <div class="form-group col-span-2">
+            <label for="upload-code">
+              Executable HTML/CSS/JS Code <span class="required">*</span>
+              <span class="label-hint">(Single self-contained HTML page or snippet with embedded CSS/JS)</span>
+            </label>
+            <textarea id="upload-code" rows="8" required class="code-editor-textarea" placeholder="<!DOCTYPE html>&#10;<html>&#10;<head>&#10;  <style>/* Your custom CSS */</style>&#10;</head>&#10;<body>&#10;  <!-- Your Login Form -->&#10;</body>&#10;</html>"></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-upload-btn">Cancel</button>
+          <button type="button" class="btn btn-outline" id="test-code-btn"><i class="fa-solid fa-play"></i> Test Code in Sandbox</button>
+          <button type="submit" class="btn btn-primary" id="submit-upload-btn"><i class="fa-solid fa-paper-plane"></i> Publish to Gallery</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 3. CREATORS DIRECTORY MODAL -->
+  <div class="modal-overlay hidden" id="creators-modal" role="dialog" aria-modal="true" aria-labelledby="creators-title">
+    <div class="modal-card creators-modal-card">
+      <div class="modal-card-header">
+        <div>
+          <h2 id="creators-title"><i class="fa-solid fa-users text-accent"></i> Top Authentication UI Designers</h2>
+          <p class="modal-subtitle">Browse profiles, featured designs, and total contributions from our global community.</p>
+        </div>
+        <button class="modal-close-btn" id="close-creators-modal-btn" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="creators-grid" id="creators-grid">
+        <!-- Dynamically populated creator cards -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 4. SIGN IN / AUTH SIMULATION MODAL -->
+  <div class="modal-overlay hidden" id="auth-modal" role="dialog" aria-modal="true">
+    <div class="modal-card auth-modal-card">
+      <div class="modal-card-header">
+        <h2>Sign In to AuthVault</h2>
+        <button class="modal-close-btn" id="close-auth-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="auth-modal-body">
+        <p>Sign in to save favorite login screens, like designs, and upload your own UI creations.</p>
+        <div class="auth-social-btns">
+          <button class="btn btn-social btn-google" id="mock-google-login">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.617z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <button class="btn btn-social btn-github" id="mock-github-login">
+            <i class="fa-brands fa-github"></i> Continue with GitHub
+          </button>
+        </div>
+        <div class="auth-divider"><span>OR</span></div>
+        <form id="mock-auth-form" onsubmit="event.preventDefault(); window.appInstance?.handleSignIn();">
+          <div class="form-group">
+            <label for="auth-email">Email Address</label>
+            <input type="email" id="auth-email" required placeholder="alex@example.com">
+          </div>
+          <div class="form-group">
+            <label for="auth-password">Password</label>
+            <input type="password" id="auth-password" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary w-full">Sign In to Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- MAIN APPLICATION JAVASCRIPT -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>
