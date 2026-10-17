@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Project A - A modern spreadsheet experience built for your workflow. Dark brutalist independent software download site.">
+  <title>Project A — Dark Brutalist Software</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Background Decorative Grid Lines -->
+  <div class="brutalist-grid-bg" aria-hidden="true"></div>
+
+  <!-- SECTION 1: TOP LOGO SECTION -->
+  <header class="logo-header">
+    <div class="container logo-container">
+      <div class="logo-wrapper">
+        <img src="./a.png" alt="Project A Logo" class="main-logo" onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+        <div class="logo-placeholder hidden" aria-hidden="true">
+          <span class="logo-text">[PROJECT A LOGO]</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- SECTION 2: MAIN HEADING AND DOWNLOAD BUTTON -->
+    <section class="hero-section" id="download">
+      <div class="container hero-container">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span> INDEPENDENT SOFTWARE RELEASE
+        </div>
+        <h1 class="hero-heading">YOUR SPREADSHEET.<br><span class="highlight-violet">YOUR WORKSPACE.</span></h1>
+        <p class="hero-subtitle">A modern spreadsheet experience built for your workflow.</p>
+
+        <div class="download-block">
+          <a href="./a.zip" download="a.zip" id="download-btn" class="btn btn-primary btn-download">
+            <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>DOWNLOAD FOR WINDOWS</span>
+          </a>
+          <span class="download-label">Download the latest release</span>
+          <div id="download-status" class="download-status" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: PRODUCT DEMONSTRATION VIDEO -->
+    <section class="video-section" id="demo">
+      <div class="container">
+        <div class="section-tag">
+          <span class="tag-number">01 //</span> DEMO VIDEO
+        </div>
+        <div class="video-card">
+          <div class="video-container">
+            <video
+              id="demo-video"
+              src="./a.mp4"
+              controls
+              muted
+              autoplay
+              playsinline
+              preload="auto"
+              poster="./b.png"
+              class="product-video">
+              Your browser does not support HTML5 video tag.
+            </video>
+            <div id="video-fallback" class="video-fallback hidden">
+              <div class="fallback-content">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+                  <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+                <p class="fallback-title">DEMO VIDEO UNAVAILABLE</p>
+                <p class="fallback-subtitle">The video file <code>./a.mp4</code> could not be loaded at this time.</p>
+              </div>
+            </div>
+          </div>
+          <div class="video-bar">
+            <span class="video-title">PROJECT A — HIGH PERFORMANCE SPREADSHEET ENGINE DEMO</span>
+            <span class="video-status-badge">4K ULTRA HD / 60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: APP UI/UX GALLERY -->
+    <section class="gallery-section" id="gallery">
+      <div class="container">
+        <div class="section-tag">
+          <span class="tag-number">02 //</span> GALLERY
+        </div>
+        <h2 class="section-heading">EXPLORE THE INTERFACE</h2>
+        <p class="section-subtitle">A closer look at the design and experience.</p>
+
+        <div class="gallery-grid">
+          <!-- Gallery Item 1 -->
+          <article class="gallery-card">
+            <div class="gallery-image-wrapper">
+              <img
+                src="./a.png"
+                alt="Product logo"
+                loading="lazy"
+                class="gallery-image"
+                onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+              >
+              <div class="img-fallback hidden">
+                <span class="fallback-code">./a.png</span>
+                <span class="fallback-label">Product logo unavailable</span>
+              </div>
+            </div>
+            <div class="gallery-caption">
+              <span class="caption-num">01.</span>
+              <div class="caption-text">
+                <h3>Product Logo</h3>
+                <p>Official brand icon and minimal identity mark.</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Gallery Item 2 -->
+          <article class="gallery-card">
+            <div class="gallery-image-wrapper">
+              <img
+                src="./b.png"
+                alt="App interface preview"
+                loading="lazy"
+                class="gallery-image"
+                onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+              >
+              <div class="img-fallback hidden">
+                <span class="fallback-code">./b.png</span>
+                <span class="fallback-label">App interface preview unavailable</span>
+              </div>
+            </div>
+            <div class="gallery-caption">
+              <span class="caption-num">02.</span>
+              <div class="caption-text">
+                <h3>App Interface Preview</h3>
+                <p>Clean grid engine and main workspace editor layout.</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Gallery Item 3 -->
+          <article class="gallery-card">
+            <div class="gallery-image-wrapper">
+              <img
+                src="./c.png"
+                alt="Additional UI/UX screenshot"
+                loading="lazy"
+                class="gallery-image"
+                onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+              >
+              <div class="img-fallback hidden">
+                <span class="fallback-code">./c.png</span>
+                <span class="fallback-label">UI/UX screenshot unavailable</span>
+              </div>
+            </div>
+            <div class="gallery-caption">
+              <span class="caption-num">03.</span>
+              <div class="caption-text">
+                <h3>Additional UI/UX Screenshot</h3>
+                <p>Advanced formula engine and real-time execution pane.</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Gallery Item 4 -->
+          <article class="gallery-card">
+            <div class="gallery-image-wrapper">
+              <img
+                src="./d.png"
+                alt="Additional application screenshot"
+                loading="lazy"
+                class="gallery-image"
+                onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+              >
+              <div class="img-fallback hidden">
+                <span class="fallback-code">./d.png</span>
+                <span class="fallback-label">Application screenshot unavailable</span>
+              </div>
+            </div>
+            <div class="gallery-caption">
+              <span class="caption-num">04.</span>
+              <div class="caption-text">
+                <h3>Additional Application Screenshot</h3>
+                <p>Custom dark brutalist workspace view and settings.</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: SOCIAL MEDIA AND CREATOR SECTION -->
+    <section class="social-section" id="community">
+      <div class="container">
+        <div class="section-tag">
+          <span class="tag-number">03 //</span> COMMUNITY
+        </div>
+        <h2 class="section-heading">FOLLOW THE PROJECT</h2>
+        <p class="section-subtitle">Stay connected with the latest builds, source updates, and release news.</p>
+
+        <div class="social-grid">
+          <!-- X / Twitter -->
+          <a href="https://x.com/soni_aadi70883" target="_blank" rel="noopener noreferrer" class="social-card">
+            <div class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-platform">X (TWITTER)</span>
+              <span class="social-handle">@soni_aadi70883</span>
+            </div>
+            <span class="social-arrow">&rarr;</span>
+          </a>
+
+          <!-- GitHub -->
+          <a href="https://github.com/aadisoni8044-code" target="_blank" rel="noopener noreferrer" class="social-card">
+            <div class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-platform">GITHUB</span>
+              <span class="social-handle">@aadisoni8044-code</span>
+            </div>
+            <span class="social-arrow">&rarr;</span>
+          </a>
+
+          <!-- Instagram -->
+          <a href="https://www.instagram.com/aadisoni8044/" target="_blank" rel="noopener noreferrer" class="social-card">
+            <div class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+            </div>
+            <div class="social-info">
+              <span class="social-platform">INSTAGRAM</span>
+              <span class="social-handle">@aadisoni8044</span>
+            </div>
+            <span class="social-arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SECTION 6: FOOTER -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-left">
+        <img src="./a.png" alt="Project A Logo" class="footer-logo" onerror="this.onerror=null; this.classList.add('hidden');">
+        <div class="footer-text">
+          <p class="footer-brand">PROJECT A</p>
+          <p class="footer-desc">An independent software project.</p>
+        </div>
+      </div>
+
+      <div class="footer-right">
+        <span class="footer-copyright">&copy; <span id="current-year">2025</span> Project A. All rights reserved.</span>
+        <a href="#top" class="back-to-top" id="back-to-top">
+          <span>BACK TO TOP</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
