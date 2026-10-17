@@ -53,6 +53,18 @@ body {
   background-color: var(--bg-color);
 }
 
+/* Interactive Ambient Canvas Background Game */
+.bg-game-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+
 /* Background Grid Overlay */
 .brutalist-grid-bg {
   position: fixed;
@@ -61,7 +73,7 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
   background-size: 60px 60px;
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
@@ -75,7 +87,7 @@ body {
   margin: 0 auto;
   padding: 0 1.5rem;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Hidden utility */
@@ -93,8 +105,8 @@ body {
 .logo-header {
   padding: 2.5rem 0 1.5rem;
   border-bottom: 2px solid var(--border-color);
-  background-color: rgba(10, 10, 10, 0.8);
-  backdrop-filter: blur(8px);
+  background-color: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(12px);
   position: relative;
   z-index: 10;
 }
@@ -307,11 +319,17 @@ body {
   margin-bottom: 2.5rem;
 }
 
-/* 6. Section 3: Video Demonstration */
+/* 6. Section 3: Two Video Demonstrations */
 .video-section {
   padding: 5rem 0;
   border-bottom: 2px solid var(--border-color);
-  background-color: #0D0D10;
+  background-color: rgba(13, 13, 16, 0.8);
+}
+
+.videos-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
 }
 
 .video-card {
@@ -319,11 +337,12 @@ body {
   background-color: var(--bg-card);
   overflow: hidden;
   box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .video-card:hover {
   border-color: var(--violet-accent);
+  box-shadow: 8px 8px 0px var(--violet-glow);
 }
 
 .video-container {
@@ -412,12 +431,13 @@ body {
   white-space: nowrap;
 }
 
-/* 7. Section 4: UI/UX Gallery */
+/* 7. Section 4: UI/UX Gallery with Lightbox */
 .gallery-section {
   padding: 5rem 0;
   border-bottom: 2px solid var(--border-color);
 }
 
+/* Gallery Grid: Desktop 2 items per row, Mobile 1 item per row */
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -430,6 +450,10 @@ body {
   display: flex;
   flex-direction: column;
   transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.clickable-gallery-card {
+  cursor: pointer;
 }
 
 .gallery-card:hover {
@@ -456,7 +480,30 @@ body {
 }
 
 .gallery-card:hover .gallery-image {
-  transform: scale(1.02);
+  transform: scale(1.03);
+}
+
+.zoom-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background-color: rgba(10, 10, 12, 0.9);
+  border: 1px solid var(--violet-accent);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0.85;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.gallery-card:hover .zoom-badge {
+  opacity: 1;
+  background-color: var(--violet-accent);
 }
 
 .img-fallback {
@@ -513,11 +560,97 @@ body {
   color: var(--text-muted);
 }
 
+/* Lightbox Modal */
+.lightbox-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.lightbox-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(5, 5, 8, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.lightbox-content {
+  position: relative;
+  z-index: 1010;
+  max-width: 90vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 3px solid var(--violet-accent);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+  padding: 1.5rem;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--violet-accent);
+  color: var(--text-main);
+  border: 2px solid var(--text-main);
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  background-color: var(--violet-hover);
+  transform: scale(1.1);
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border: 1px solid var(--border-color);
+}
+
+.lightbox-caption {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--violet-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 /* 8. Section 5: Social Media Links */
 .social-section {
   padding: 5rem 0;
   border-bottom: 2px solid var(--border-color);
-  background-color: #0D0D10;
+  background-color: rgba(13, 13, 16, 0.8);
 }
 
 .social-grid {
@@ -632,7 +765,6 @@ body {
   font-weight: 800;
   font-size: 1.1rem;
   letter-spacing: 1px;
-
 }
 
 .footer-desc {
@@ -674,10 +806,10 @@ body {
   transform: translateY(-2px);
 }
 
-/* 10. Responsive Breakpoints */
+/* 10. Responsive Breakpoints & Accessibility */
 @media (max-width: 992px) {
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Mobile 1 image per row */
   }
 
   .social-grid {
@@ -718,5 +850,19 @@ body {
   .back-to-top {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .bg-game-canvas {
+    display: none !important;
   }
 }
