@@ -1,0 +1,540 @@
+/* -------------------------------------------------------------------------- */
+/*  A — DARK BRUTALIST SOFTWARE DOWNLOAD WEBSITE                              */
+/*  Theme: Premium Dark Brutalism (#0A0A0A bg, Violet #8B5CF6 accent, White text) */
+/* -------------------------------------------------------------------------- */
+
+:root {
+    --bg-color: #0A0A0A;
+    --card-bg: #121214;
+    --border-color: #27272A;
+    --border-bright: #3F3F46;
+    --text-color: #FFFFFF;
+    --text-muted: #A1A1AA;
+    --accent-color: #8B5CF6;
+    --accent-hover: #A78BFA;
+    --accent-glow: rgba(139, 92, 246, 0.25);
+    --border-width: 2px;
+    --border-thick: 3px;
+    --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* Base Reset & Typography */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.site-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+}
+
+/* Focus outline for accessibility */
+a:focus-visible,
+button:focus-visible,
+video:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 1. LOGO SECTION                                                            */
+/* -------------------------------------------------------------------------- */
+.logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1rem;
+}
+
+.logo-wrapper {
+    background-color: var(--card-bg);
+    border: var(--border-thick) solid var(--border-bright);
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 6px 6px 0px var(--accent-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logo-wrapper:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px var(--accent-color);
+}
+
+.app-logo {
+    max-width: 180px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. MAIN HEADING AND DOWNLOAD BUTTON                                         */
+/* -------------------------------------------------------------------------- */
+.hero-section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at center, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+}
+
+.main-heading {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--text-color);
+    margin-bottom: 1.25rem;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+}
+
+.hero-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    color: var(--text-muted);
+    max-width: 650px;
+    margin: 0 auto 2.5rem auto;
+    font-weight: 400;
+}
+
+.download-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 1.15rem 2.5rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: var(--border-thick) solid #FFFFFF;
+    box-shadow: 6px 6px 0px #FFFFFF;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.download-btn:hover {
+    background-color: var(--accent-hover);
+    color: #000000;
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0px #FFFFFF;
+}
+
+.download-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #FFFFFF;
+}
+
+.download-icon {
+    flex-shrink: 0;
+}
+
+.download-label {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.download-status {
+    font-size: 0.9rem;
+    color: #EF4444;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. PRODUCT DEMONSTRATION VIDEO                                             */
+/* -------------------------------------------------------------------------- */
+.video-section {
+    width: 100%;
+}
+
+.video-card {
+    background-color: var(--card-bg);
+    border: var(--border-thick) solid var(--border-bright);
+    box-shadow: 8px 8px 0px var(--accent-color);
+    overflow: hidden;
+}
+
+.video-header {
+    background-color: #18181B;
+    border-bottom: var(--border-width) solid var(--border-bright);
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.window-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background-color: #3F3F46;
+    border-radius: 50%;
+
+}
+
+.video-title-bar {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    font-weight: 700;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000000;
+}
+
+.demo-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. APP UI/UX GALLERY                                                       */
+/* -------------------------------------------------------------------------- */
+.gallery-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.section-header {
+    border-left: 5px solid var(--accent-color);
+    padding-left: 1rem;
+}
+
+.section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--text-color);
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.gallery-card {
+    background-color: var(--card-bg);
+    border: var(--border-thick) solid var(--border-bright);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 6px 6px 0px var(--border-bright);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.gallery-card:hover {
+    border-color: var(--accent-color);
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0px var(--accent-color);
+}
+
+.image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background-color: #000000;
+    overflow: hidden;
+    border-bottom: var(--border-width) solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.gallery-card:hover .gallery-img {
+    transform: scale(1.02);
+}
+
+.card-caption {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    background-color: var(--card-bg);
+}
+
+.card-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.card-desc {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Placeholder styling for missing images */
+.media-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    background-color: #18181B;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center;
+    border: 2px dashed var(--border-bright);
+    gap: 0.5rem;
+}
+
+.media-placeholder-title {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--accent-color);
+    font-weight: 700;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 5. SOCIAL MEDIA AND CREATOR SECTION                                        */
+/* -------------------------------------------------------------------------- */
+.social-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.social-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: var(--border-thick) solid var(--border-bright);
+    padding: 1.25rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    box-shadow: 5px 5px 0px var(--border-bright);
+    transition: all 0.2s ease;
+}
+
+.social-link-btn:hover {
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0px #FFFFFF;
+}
+
+.social-icon {
+    flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 6. FOOTER                                                                  */
+/* -------------------------------------------------------------------------- */
+.site-footer {
+    border-top: var(--border-thick) solid var(--border-bright);
+    padding-top: 2.5rem;
+    padding-bottom: 1rem;
+    margin-top: 2rem;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border: var(--border-width) solid var(--border-bright);
+    padding: 2px;
+    background-color: var(--card-bg);
+}
+
+.footer-tagline {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.footer-copyright {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.back-to-top {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    border: var(--border-width) solid var(--border-bright);
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.back-to-top:hover {
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+/* -------------------------------------------------------------------------- */
+/* RESPONSIVE DESIGN BREAKPOINTS                                              */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    .site-container {
+        gap: 3rem;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .social-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 1.25rem 0.75rem;
+    }
+
+    .site-container {
+        gap: 2.5rem;
+    }
+
+    .logo-wrapper {
+        padding: 1rem 1.75rem;
+    }
+
+    .app-logo {
+        max-width: 140px;
+    }
+
+    .main-heading {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .download-btn {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1.05rem;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
