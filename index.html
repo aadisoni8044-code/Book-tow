@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book/Tow — Premium Orange-Branded Desktop Spreadsheet Application. Your Workspace. Your Way.">
+  <title>Book/Tow — Premium Desktop Spreadsheet Application</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/a.png">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <a href="#hero" class="nav-brand">
+        <img src="assets/a.png" alt="Book/Tow Logo" class="nav-logo-icon">
+        <span class="nav-brand-text">Book/Tow</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#videos">Features</a>
+        <a href="#gallery">Screenshots</a>
+        <a href="#download" class="nav-cta-btn">Download App</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 3. Hero Section — Centered Logo -->
+    <section id="hero" class="hero-section">
+      <div class="hero-container">
+        <!-- Main Centered Book/Tow Logo -->
+        <div class="logo-wrapper">
+          <img src="assets/a.png" alt="Book/Tow Official Logo" class="hero-logo" id="main-logo">
+        </div>
+
+        <h1 class="hero-title">Book/Tow</h1>
+        <p class="hero-tagline">Your Workspace. Your Way.</p>
+        <p class="hero-subtitle">
+          A high-performance, GPU-accelerated desktop spreadsheet application engineered for speed, safety, and seamless numerical workflows.
+        </p>
+
+        <!-- 4. Download Section -->
+        <div id="download" class="download-section">
+          <div class="download-card">
+            <h2 class="download-header">Get Started with Book/Tow</h2>
+            <p class="download-info">Free standalone package • Latest Release v1.1.0</p>
+
+            <div class="download-buttons">
+              <!-- Option 1: Download Now (Enabled) -->
+              <a href="downloads/Booktow.zip" class="btn btn-primary download-btn" id="download-now-btn" download="Booktow.zip">
+                <svg class="btn-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <div class="btn-text-group">
+                  <span class="btn-main-text">Download Now ✅</span>
+                  <span class="btn-sub-text" id="file-size-badge">Booktow.zip (~1 KB)</span>
+                </div>
+              </a>
+
+              <!-- Option 2: Download for Windows (Disabled until package available) -->
+              <button class="btn btn-disabled" disabled aria-disabled="true" title="Windows Installer package coming soon">
+                <svg class="btn-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.95-9.6L24 0v11.4H10.95M0 12.6h9.75v9.451L0 20.701M10.95 12.6H24V24l-13.05-1.85"/>
+                </svg>
+                <div class="btn-text-group">
+                  <span class="btn-main-text">Download for Windows</span>
+                  <span class="btn-sub-text">Package in Preparation</span>
+                </div>
+              </button>
+
+              <!-- Option 3: Download for macOS (Disabled until package available) -->
+              <button class="btn btn-disabled" disabled aria-disabled="true" title="macOS Installer package coming soon">
+                <svg class="btn-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.27c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 0.6-2.65 1.37-.58.67-1.09 1.75-.95 2.78 1.01.08 2.05-.55 2.68-1.3"/>
+                </svg>
+                <div class="btn-text-group">
+                  <span class="btn-main-text">Download for macOS</span>
+                  <span class="btn-sub-text">Package in Preparation</span>
+                </div>
+              </button>
+            </div>
+
+            <p class="download-security-note">
+              🔒 Safe & Verifiable • Zero telemetry • Local execution
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video Showcase Section -->
+    <div id="videos" class="videos-wrapper">
+      <!-- 5. First Video Section — a.mp4 -->
+      <section class="video-section">
+        <div class="section-container">
+          <div class="section-header">
+            <span class="section-badge">INTERACTIVE WORKSPACE</span>
+            <h2 class="section-title">Fluent Grid & High-Speed Formula Recalculation</h2>
+            <p class="section-description">Experience zero-lag cell navigation, multi-column selection, and real-time AST dependency evaluation.</p>
+          </div>
+
+          <div class="video-player-container">
+            <video class="product-video" autoplay muted loop playsinline preload="metadata" id="video-a">
+              <source src="assets/a.mp4" type="video/mp4">
+              <p class="video-fallback">Your browser does not support HTML5 video playback. Please upgrade your browser to watch the Book/Tow demonstration.</p>
+            </video>
+            <div class="video-overlay-badge">Live Demonstration • Grid Engine</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Second Video Section — b.mp4 -->
+      <section class="video-section">
+        <div class="section-container">
+          <div class="section-header">
+            <span class="section-badge">ANALYTICS ENGINE</span>
+            <h2 class="section-title">See Book/Tow in Action</h2>
+            <p class="section-description">Transform complex dataset arrays into crystal-clear vector visualizations and dynamic analytics instantly.</p>
+          </div>
+
+          <div class="video-player-container">
+            <video class="product-video" autoplay muted loop playsinline preload="metadata" id="video-b">
+              <source src="assets/b.mp4" type="video/mp4">
+              <p class="video-fallback">Your browser does not support HTML5 video playback. Please upgrade your browser to watch the Book/Tow demonstration.</p>
+            </video>
+            <div class="video-overlay-badge">Live Demonstration • Data Analytics</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 7. Vertical Screenshot Gallery — b.png, c.png, d.png, e.png -->
+    <section id="gallery" class="gallery-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-badge">APPLICATION TOUR</span>
+          <h2 class="section-title">Explore the Book/Tow Environment</h2>
+          <p class="section-description">Click any screenshot to inspect detailed high-resolution workspace views.</p>
+        </div>
+
+        <div class="vertical-gallery">
+          <!-- Screenshot 1: b.png -->
+          <div class="gallery-item-section">
+            <div class="gallery-card">
+              <div class="image-wrapper">
+                <img src="assets/b.png" alt="Book/Tow Workspace Grid View showing financial revenue tables" class="gallery-img" loading="lazy" data-title="Primary Workspace & Spreadsheet Grid">
+                <div class="image-hover-overlay">
+                  <span class="zoom-icon">🔍 Click to Expand</span>
+                </div>
+              </div>
+              <div class="gallery-caption">
+                <h3>1. High-Performance Workspace Grid</h3>
+                <p>Features structured multi-tab sheets, cell formatting, formula bars, and fluid keyboard navigation.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screenshot 2: c.png -->
+          <div class="gallery-item-section">
+            <div class="gallery-card">
+              <div class="image-wrapper">
+                <img src="assets/c.png" alt="Book/Tow Visual Analytics and Charts Dashboard" class="gallery-img" loading="lazy" data-title="Visual Analytics & Interactive Charts">
+                <div class="image-hover-overlay">
+                  <span class="zoom-icon">🔍 Click to Expand</span>
+                </div>
+              </div>
+              <div class="gallery-caption">
+                <h3>2. Real-time Interactive Analytics</h3>
+                <p>Embedded chart creation with GPU acceleration supporting bar charts, line graphs, and margin performance tracking.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screenshot 3: d.png -->
+          <div class="gallery-item-section">
+            <div class="gallery-card">
+              <div class="image-wrapper">
+                <img src="assets/d.png" alt="Book/Tow Pratt AST Formula Assistant & Library Modal" class="gallery-img" loading="lazy" data-title="Formula Assistant & AST Compiler">
+                <div class="image-hover-overlay">
+                  <span class="zoom-icon">🔍 Click to Expand</span>
+                </div>
+              </div>
+              <div class="gallery-caption">
+                <h3>3. Intelligent Formula Assistant</h3>
+                <p>Sandboxed formula parsing engine with built-in functions, syntax validation, and live preview evaluation.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screenshot 4: e.png -->
+          <div class="gallery-item-section">
+            <div class="gallery-card">
+              <div class="image-wrapper">
+                <img src="assets/e.png" alt="Book/Tow Export Options for Native .BTOW, XLSX, CSV, and PDF" class="gallery-img" loading="lazy" data-title="Native .BTOW & Universal Export Dialog">
+                <div class="image-hover-overlay">
+                  <span class="zoom-icon">🔍 Click to Expand</span>
+                </div>
+              </div>
+              <div class="gallery-caption">
+                <h3>4. Native .BTOW & Flexible Universal Export</h3>
+                <p>Save work in native lossless `.btow` containers or export directly to Microsoft Excel, CSV, and PDF formats.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lightbox Modal for Screenshots -->
+  <div id="lightbox" class="lightbox-modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
+    <div class="lightbox-overlay"></div>
+    <div class="lightbox-container">
+      <button class="lightbox-close" aria-label="Close image lightbox">&times;</button>
+      <div class="lightbox-body">
+        <img src="" alt="" id="lightbox-img" class="lightbox-content-img">
+        <div class="lightbox-caption-text" id="lightbox-caption"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo-row">
+            <img src="assets/a.png" alt="Book/Tow Logo" class="footer-logo">
+            <span class="footer-title">Book/Tow</span>
+          </div>
+          <p class="footer-desc">
+            Book/Tow is an orange-branded desktop spreadsheet application designed for power users, financial analysts, and modern data creators.
+          </p>
+        </div>
+
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <h4>Navigation</h4>
+            <ul>
+              <li><a href="#hero">Home</a></li>
+              <li><a href="#download">Download App</a></li>
+              <li><a href="#videos">Video Showcase</a></li>
+              <li><a href="#gallery">Screenshots</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="#download" class="footer-modal-trigger" data-modal="docs">Documentation</a></li>
+              <li><a href="#download" class="footer-modal-trigger" data-modal="support">User Support</a></li>
+              <li><a href="#download" class="footer-modal-trigger" data-modal="privacy">Privacy & Security</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 Book/Tow Project. All rights reserved. "Your Workspace. Your Way."</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Generic Footer Info Modal -->
+  <div id="info-modal" class="info-modal" aria-hidden="true">
+    <div class="info-modal-backdrop"></div>
+    <div class="info-modal-content">
+      <button class="info-modal-close">&times;</button>
+      <h3 id="info-modal-title">Information</h3>
+      <div id="info-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 8. Separate JavaScript File -->
+  <script src="js/main.js"></script>
+</body>
+</html>
