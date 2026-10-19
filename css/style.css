@@ -474,6 +474,72 @@ body {
     font-size: 0.88rem;
 }
 
+/* Social Media Section */
+.social-section {
+    background: var(--bg-dark);
+    border-top: 1px solid var(--border-color);
+    padding: 2.5rem 1.5rem 3rem;
+}
+
+.social-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.social-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.social-link:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-orange);
+    color: var(--orange-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--orange-glow);
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transition: transform var(--transition-fast);
+}
+
+.social-link:hover .social-icon {
+    transform: scale(1.1);
+}
+
 /* Responsive Media Queries */
 @media (max-width: 768px) {
     .top-bar {
