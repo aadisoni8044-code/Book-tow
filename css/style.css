@@ -272,6 +272,13 @@ body {
     fill: currentColor;
 }
 
+.os-icon-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
+
 .download-card-details {
     position: relative;
     z-index: 2;
