@@ -1,3 +1,6 @@
+<img width="363" height="122" alt="Screenshot 2026-10-23 153323" src="https://github.com/user-attachments/assets/5a3b6583-c845-4a02-b794-08a010348f05" />
+
+
 # Book/Tow
 
 **A spreadsheet application inspired by Microsoft Excel.**
