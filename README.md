@@ -1,46 +1,35 @@
 # Book/Tow
 
-A spreadsheet application inspired by Microsoft Excel, built with Python.
+**A spreadsheet application inspired by Microsoft Excel.**
 
-Book/Tow aims to provide a simple way to organize, manage, and work with spreadsheet data through a user-friendly interface.
+Book/Tow is a simple, Python-based spreadsheet application designed to help users organize and manage their data through a spreadsheet-style interface.
 
 ## ✨ Features
 
-- 📊 **Spreadsheet Interface** — Work with data in rows and columns.
-- 📴 **Offline Use** — Designed for working without an internet connection.
-- 🔐 **No Mandatory Login** — No account is required to use the app, if supported by your current version.
-- 🎨 **Orange-Themed Design** — A distinctive interface with orange branding.
-- 🌙 **Light and Dark Themes** — Switch between themes if available in your current version.
-- 🖌️ **Cell Formatting** — Customize cell colors, borders, and other formatting where supported.
-- 📁 **File Management** — Create, open, and save spreadsheet projects where supported.
+- 📊 **Spreadsheet Interface** — Work with data in rows and columns, similar to Microsoft Excel.
+- 🔒 **No Login Required** — You don't need to log in to use the application.
+- 📝 **No Sign Up Required** — No registration is needed.
+- 👤 **No Account Required** — You can use the app without creating an account.
+- 🌐 **Works Offline** — No internet connection is required to use the app's offline features.
+- 🎨 **Simple Interface** — Designed with a focus on simplicity and ease of use.
+- 🐍 **Built with Python** — Developed using Python.
 
-## 🎯 Project Goal
+## 🚀 Why Book/Tow?
 
-The goal of Book/Tow is to provide a straightforward spreadsheet experience inspired by applications such as Microsoft Excel, with a focus on simplicity and offline usability.
+Book/Tow aims to provide a straightforward spreadsheet experience without requiring users to create an account or depend on an internet connection for its offline functionality.
 
-Book/Tow is an independent project and is not affiliated with or endorsed by Microsoft.
+Open the application and start working with your data.
 
-## 💻 Technology
+## 💻 Installation
 
-- Python
-- Additional libraries and frameworks are listed in the project's source code and dependency files.
+1. Visit the project's Releases or official download page.
+2. Download the version for your operating system, if available.
+3. Follow the installation instructions provided with that release.
 
-## 📥 Download
+## 📌 Project Status
 
-Visit the project's GitHub **Releases** section to find available downloads.
+Book/Tow is an evolving project. Features and improvements may be added over time.
 
-If no release is available yet, check back later for updates.
+## 📄 License
 
-## 🚧 Development Status
-
-Book/Tow is under development. Features and improvements may be added over time.
-
-## 🤝 Feedback
-
-Found a bug or have an idea for improvement?
-
-Open an issue in this GitHub repository to share feedback or report a problem.
-
----
-
-**Book/Tow — A simple spreadsheet experience, inspired by Microsoft Excel.**
+Check the repository for license information before using, modifying, or distributing this project.
