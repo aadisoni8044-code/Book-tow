@@ -3,7 +3,7 @@
 
 # Book/Tow
 
-**book/tow app download now -->**https://book-tow.netlify.app/
+**book/tow app download now -->** https://book-tow.netlify.app/
 
 **A simple spreadsheet application inspired by Microsoft Excel.**
 
