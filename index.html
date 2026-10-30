@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Spatial UI - Amazon Forest Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           SPATIAL UI & AMAZON FOREST SYSTEM DESIGN (CSS)
+           ========================================================================== */
+        :root {
+            --bg-dark: #040806;
+            --emerald-glow: rgba(16, 185, 129, 0.4);
+            --emerald-primary: #10b981;
+            --emerald-accent: #34d399;
+            --google-red: #ea4335;
+            --google-blue: #4285f4;
+            --google-yellow: #fbbc05;
+            --google-green: #34a853;
+            --glass-bg: rgba(12, 24, 18, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-border-hover: rgba(52, 211, 153, 0.35);
+            --glass-specular: rgba(255, 255, 255, 0.25);
+            --text-main: #f0fdf4;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --spatial-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.75), 0 0 40px rgba(16, 185, 129, 0.15);
+            --spatial-depth: perspective(1200px);
+            --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Forest Filter Themes */
+        [data-forest-theme="emerald-night"] {
+            --forest-filter: hue-rotate(0deg) saturate(1.1) brightness(0.85);
+            --forest-tint: rgba(4, 16, 10, 0.45);
+        }
+        [data-forest-theme="deep-jungle"] {
+            --forest-filter: hue-rotate(-25deg) saturate(1.4) brightness(0.7);
+            --forest-tint: rgba(2, 24, 12, 0.55);
+        }
+        [data-forest-theme="mist-canopy"] {
+            --forest-filter: hue-rotate(15deg) saturate(0.8) contrast(1.1) brightness(0.95);
+            --forest-tint: rgba(15, 28, 30, 0.4);
+        }
+        [data-forest-theme="golden-hour"] {
+            --forest-filter: hue-rotate(-45deg) saturate(1.5) brightness(0.9);
+            --forest-tint: rgba(30, 20, 5, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --------------------------------------------------------------------------
+           BACKGROUND VIDEO & CANVAS VISUALIZER (AMAZON FOREST)
+           -------------------------------------------------------------------------- */
+        .viewport-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1200px;
+        }
+
+        .forest-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            filter: var(--forest-filter);
+            transition: filter 1.2s var(--transition-smooth);
+        }
+
+        .forest-video-container video,
+        .forest-canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%) scale(1.05);
+            object-fit: cover;
+            transition: transform 0.5s ease-out;
+        }
+
+        .forest-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(4, 12, 8, 0.2) 0%, rgba(2, 6, 4, 0.75) 100%),
+                        var(--forest-tint);
+            z-index: 2;
+            transition: background 1s ease;
+            pointer-events: none;
+        }
+
+        /* Dynamic Bioluminescent Fireflies Canvas */
+        #firefliesCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* Ambient Spatial Lighting Glows */
+        .spatial-ambient-glow {
+            position: absolute;
+            width: 650px;
+            height: 650px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--emerald-glow) 0%, rgba(16, 185, 129, 0) 70%);
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.6;
+            filter: blur(60px);
+            animation: pulseGlow 8s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9) translate(-5%, -5%); opacity: 0.4; }
+            100% { transform: scale(1.1) translate(5%, 5%); opacity: 0.75; }
+        }
+
+        /* --------------------------------------------------------------------------
+           SPATIAL GLASS CARD (VISIONOS STYLE)
+           -------------------------------------------------------------------------- */
+        .spatial-stage {
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            padding: 20px;
+        }
+
+        .glass-card {
+            position: relative;
+            width: 440px;
+            max-width: 92vw;
+            background: var(--glass-bg);
+            backdrop-filter: blur(35px) saturate(180%);
+            -webkit-backdrop-filter: blur(35px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 38px 36px;
+            box-shadow: var(--spatial-shadow);
+            transform-style: preserve-3d;
+            overflow: hidden;
+            transition: border-color 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth);
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                115deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0.08) 45%,
+                rgba(255, 255, 255, 0.18) 50%,
+                rgba(255, 255, 255, 0.08) 55%,
+                transparent 80%
+            );
+            transform: translateZ(2px);
+            pointer-events: none;
+            transition: transform 0.5s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--glass-border-hover);
+            box-shadow: 0 35px 70px -10px rgba(0, 0, 0, 0.8), 0 0 50px rgba(52, 211, 153, 0.25);
+        }
+
+        .glass-specular-edge {
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 50%, rgba(16,185,129,0.2) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        /* --------------------------------------------------------------------------
+           CARD CONTENT & LOGO HEADER
+           -------------------------------------------------------------------------- */
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 28px;
+            transform: translateZ(30px);
+        }
+
+        .gmail-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .gmail-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gmail-icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 70%);
+        }
+
+        .brand-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .spatial-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--emerald-accent);
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--emerald-accent);
+            box-shadow: 0 0 8px var(--emerald-accent);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        /* --------------------------------------------------------------------------
+           MULTI-STEP FORM STEPS
+           -------------------------------------------------------------------------- */
+        .step-container {
+            position: relative;
+            width: 100%;
+            min-height: 270px;
+            transform: translateZ(25px);
+        }
+
+        .auth-step {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(30px) scale(0.96);
+            transition: all 0.4s var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .auth-step.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+        }
+
+        .auth-step.exit-left {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-30px) scale(0.96);
+        }
+
+        /* Input Group */
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin-left: 2px;
+        }
+
+        .input-field-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .spatial-input {
+            width: 100%;
+            height: 52px;
+            padding: 0 18px 0 46px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-main);
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s var(--transition-smooth);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .spatial-input:focus {
+            border-color: var(--emerald-accent);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 15px rgba(52, 211, 153, 0.25);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-dim);
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .spatial-input:focus ~ .input-icon {
+            color: var(--emerald-accent);
+        }
+
+        /* Action Buttons */
+        .btn-primary {
+            width: 100%;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px -4px rgba(16, 185, 129, 0.55);
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 6px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider-text {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* --------------------------------------------------------------------------
+           SOCIAL LOGIN BUTTONS (GOOGLE, GITHUB, X)
+           -------------------------------------------------------------------------- */
+        .social-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .social-btn {
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-btn:active {
+            transform: translateY(0);
+        }
+
+        .social-btn svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .social-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip hint */
+        .social-btn::after {
+            content: attr(data-provider);
+            position: absolute;
+            bottom: -28px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .social-btn:hover::after {
+            opacity: 1;
+            bottom: 4px;
+        }
+
+        .user-preview-chip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            margin-bottom: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .user-email-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-status-text {
+            font-size: 11px;
+            color: var(--emerald-accent);
+        }
+
+        .btn-secondary-link {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: center;
+            transition: color 0.2s ease;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .btn-secondary-link:hover {
+            color: var(--emerald-accent);
+        }
+
+        /* --------------------------------------------------------------------------
+           AUTHENTICATED DASHBOARD STATE
+           -------------------------------------------------------------------------- */
+        .dashboard-view {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 0;
+        }
+
+        .spatial-avatar-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, var(--emerald-accent), var(--google-blue));
+            box-shadow: 0 0 30px rgba(52, 211, 153, 0.4);
+            animation: spinRing 12s linear infinite;
+        }
+
+        @keyframes spinRing {
+            100% { transform: rotate(360deg); }
+        }
+
+        .dashboard-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--emerald-accent);
+            font-weight: 700;
+        }
+
+        .dashboard-welcome {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--emerald-accent);
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* --------------------------------------------------------------------------
+           VIDEO & AMBIENT UI UX CONTROLS (FLOATING HUD)
+           -------------------------------------------------------------------------- */
+        .spatial-hud {
+            position: absolute;
+            bottom: 28px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(10, 20, 15, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 20px;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .spatial-hud:hover {
+            border-color: rgba(52, 211, 153, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(52, 211, 153, 0.2);
+        }
+
+        .hud-control-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hud-control-btn:hover {
+            background: rgba(52, 211, 153, 0.2);
+            border-color: var(--emerald-accent);
+            color: var(--emerald-accent);
+            transform: scale(1.1);
+        }
+
+        .hud-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hud-theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-pill {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .theme-pill.active, .theme-pill:hover {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--emerald-accent);
+            color: #ffffff;
+        }
+
+        /* Volume Slider */
+        .volume-control-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 70px;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--emerald-accent);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--emerald-accent);
+        }
+
+        /* Audio Visualizer Waves */
+        .audio-wave-box {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 16px;
+        }
+
+        .audio-bar {
+            width: 3px;
+            background: var(--emerald-accent);
+            border-radius: 3px;
+            height: 4px;
+            transition: height 0.1s ease;
+        }
+
+        .audio-wave-box.playing .audio-bar:nth-child(1) { animation: wave 0.8s infinite ease-in-out alternate; }
+        .audio-wave-box.playing .audio-bar:nth-child(2) { animation: wave 1.1s infinite ease-in-out alternate 0.2s; }
+        .audio-wave-box.playing .audio-bar:nth-child(3) { animation: wave 0.7s infinite ease-in-out alternate 0.4s; }
+        .audio-wave-box.playing .audio-bar:nth-child(4) { animation: wave 0.9s infinite ease-in-out alternate 0.1s; }
+
+        @keyframes wave {
+            0% { height: 4px; }
+            100% { height: 16px; }
+        }
+
+        /* --------------------------------------------------------------------------
+           NOTIFICATION TOASTS & OVERLAYS
+           -------------------------------------------------------------------------- */
+        .spatial-toast {
+            position: absolute;
+            top: 28px;
+            z-index: 30;
+            background: rgba(12, 28, 20, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--emerald-accent);
+            border-radius: 30px;
+            padding: 10px 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(52, 211, 153, 0.3);
+            transform: translateY(-80px);
+            opacity: 0;
+            transition: all 0.4s var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .spatial-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 520px) {
+            .glass-card {
+                padding: 28px 22px;
+            }
+            .spatial-hud {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 90%;
+                border-radius: 20px;
+                padding: 10px;
+                bottom: 14px;
+            }
+            .theme-pill {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-forest-theme="emerald-night">
+
+    <div class="viewport-wrapper" id="viewport">
+        <!-- AMAZON FOREST BACKGROUND VIDEO / CANVAS -->
+        <div class="forest-video-container" id="forestVideoContainer">
+            <!-- Canvas fallback & video simulation layer -->
+            <canvas id="amazonForestCanvas" class="forest-canvas"></canvas>
+            <video id="forestVideo" class="forest-video" loop muted playsinline crossorigin="anonymous" style="display: none;">
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div class="forest-overlay"></div>
+        <canvas id="firefliesCanvas"></canvas>
+        <div class="spatial-ambient-glow" id="ambientGlow"></div>
+
+        <!-- SPATIAL TOAST NOTIFICATION -->
+        <div class="spatial-toast" id="spatialToast">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span id="toastMessage">Connected to Amazon Forest Spatial Node</span>
+        </div>
+
+        <!-- SPATIAL GLASS CARD LOGIN UI -->
+        <div class="spatial-stage" id="spatialStage">
+            <div class="glass-card" id="glassCard">
+                <div class="glass-specular-edge"></div>
+
+                <div class="card-header">
+                    <div class="gmail-brand">
+                        <div class="gmail-icon-wrapper">
+                            <!-- Gmail Animated Vector Icon -->
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <path d="M1.5 18V6C1.5 4.89543 2.39543 4 3.5 4H20.5C21.6046 4 22.5 4.89543 22.5 6V18C22.5 19.1046 21.6046 20 20.5 20H3.5C2.39543 20 1.5 19.1046 1.5 18Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)"/>
+                                <path d="M2.25 5.25L12 12.75L21.75 5.25" stroke="var(--google-red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2.25 18.75V6L10 12" stroke="var(--google-blue)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M21.75 18.75V6L14 12" stroke="var(--google-green)" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M3.5 20H20.5" stroke="var(--google-yellow)" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h1 class="brand-title">Gmail</h1>
+                    </div>
+                    <div class="spatial-badge">
+                        <span class="badge-dot"></span>
+                        Spatial Forest OS
+                    </div>
+                    <p class="card-subtitle" id="stepSubtitle">Sign in to proceed to Spatial Workspace</p>
+                </div>
+
+                <!-- DYNAMIC MULTI-STEP CONTENT -->
+                <div class="step-container">
+
+                    <!-- STEP 1: EMAIL ENTRY -->
+                    <div class="auth-step active" id="stepEmail">
+                        <div class="input-wrapper">
+                            <label class="input-label" for="emailInput">Email or Phone</label>
+                            <div class="input-field-container">
+                                <input type="email" id="emailInput" class="spatial-input" placeholder="alex.forest@gmail.com" autocomplete="username">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" id="btnEmailNext">
+                            <span>Continue</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+
+                        <div class="divider">
+                            <div class="divider-line"></div>
+                            <span class="divider-text">Or Sign In With</span>
+                            <div class="divider-line"></div>
+                        </div>
+
+                        <!-- SOCIAL LOG IN BUTTONS (GOOGLE, GITHUB, X) -->
+                        <div class="social-grid">
+                            <!-- GOOGLE -->
+                            <button class="social-btn" id="btnSocialGoogle" data-provider="Google" title="Sign in with Google">
+                                <svg viewBox="0 0 24 24">
+                                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.3 8.9 5 12 5z"/>
+                                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                                    <path fill="#FBBC05" d="M5.3 14.7c-.2-.7-.4-1.8-.4-2.7s.2-2 .4-2.7L1.6 6.4C.6 8.4 0 10.1 0 12s.6 3.6 1.6 5.6l3.7-2.9z"/>
+                                    <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.3-6.7-5.3L1.6 16C3.5 19.8 7.4 23 12 23z"/>
+                                </svg>
+                            </button>
+
+                            <!-- GITHUB -->
+                            <button class="social-btn" id="btnSocialGithub" data-provider="GitHub" title="Sign in with GitHub">
+                                <svg viewBox="0 0 24 24" fill="#ffffff">
+                                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                                </svg>
+                            </button>
+
+                            <!-- X (TWITTER) -->
+                            <button class="social-btn" id="btnSocialX" data-provider="X OS" title="Sign in with X">
+                                <svg viewBox="0 0 24 24" fill="#ffffff">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: PASSWORD / PASSKEY ENTRY -->
+                    <div class="auth-step" id="stepPassword">
+                        <div class="user-preview-chip">
+                            <div class="user-avatar" id="avatarLetter">A</div>
+                            <div class="user-info">
+                                <span class="user-email-text" id="displayUserEmail">user@gmail.com</span>
+                                <span class="user-status-text">Spatial Passkey Enabled</span>
+                            </div>
+                        </div>
+
+                        <div class="input-wrapper">
+                            <label class="input-label" for="passwordInput">Password or Passkey</label>
+                            <div class="input-field-container">
+                                <input type="password" id="passwordInput" class="spatial-input" placeholder="••••••••••••" autocomplete="current-password">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" id="btnPasswordNext">
+                            <span>Authenticate Spatial ID</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </button>
+
+                        <button class="btn-secondary-link" id="btnBackToEmail">Use a different email address</button>
+                    </div>
+
+                    <!-- STEP 3: LOGGED IN DASHBOARD VIEW -->
+                    <div class="auth-step" id="stepDashboard">
+                        <div class="dashboard-view">
+                            <div class="spatial-avatar-ring">
+                                <div class="dashboard-avatar" id="dashAvatar">A</div>
+                            </div>
+
+                            <h2 class="dashboard-welcome">Welcome to Gmail Spatial</h2>
+                            <p style="font-size: 13px; color: var(--text-muted);">Amazon Forest Node Active • High Priority Mail Syncing</p>
+
+                            <div class="dashboard-stats">
+                                <div class="stat-card">
+                                    <span class="stat-val">24</span>
+                                    <span class="stat-lbl">Unread Mails</span>
+                                </div>
+                                <div class="stat-card">
+                                    <span class="stat-val">100%</span>
+                                    <span class="stat-lbl">Spatial Encryption</span>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary" id="btnSignOut" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); margin-top: 10px;">
+                                <span>Sign Out Workspace</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- FLOATING SPATIAL HUD - VIDEO UI UX CONTROLS -->
+        <div class="spatial-hud" id="spatialHud">
+            <!-- Play/Pause Video Button -->
+            <button class="hud-control-btn" id="btnToggleVideo" title="Play / Pause Ambient Video">
+                <svg id="iconPause" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                <svg id="iconPlay" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            </button>
+
+            <!-- Audio Mute / Synth Sound Button -->
+            <button class="hud-control-btn" id="btnToggleAudio" title="Toggle Amazon Synth Audio">
+                <svg id="iconMute" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                <svg id="iconSound" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+
+            <div class="volume-control-wrapper">
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="0.5">
+            </div>
+
+            <!-- Audio Wave Animation Indicator -->
+            <div class="audio-wave-box" id="audioWaveBox">
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <!-- Amazon Forest Theme Filter Switcher -->
+            <div class="hud-theme-selector">
+                <button class="theme-pill active" data-theme="emerald-night">Emerald</button>
+                <button class="theme-pill" data-theme="deep-jungle">Jungle</button>
+                <button class="theme-pill" data-theme="mist-canopy">Mist</button>
+                <button class="theme-pill" data-theme="golden-hour">Golden</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       SPATIAL INTERACTIVE & SYNTHESIZER LOGIC (JS)
+       ========================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM ELEMENTS ---
+            const viewport = document.getElementById('viewport');
+            const spatialStage = document.getElementById('spatialStage');
+            const glassCard = document.getElementById('glassCard');
+            const ambientGlow = document.getElementById('ambientGlow');
+            const forestVideo = document.getElementById('forestVideo');
+            const forestCanvas = document.getElementById('amazonForestCanvas');
+            const firefliesCanvas = document.getElementById('firefliesCanvas');
+            const spatialToast = document.getElementById('spatialToast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Form Steps & Controls
+            const stepEmail = document.getElementById('stepEmail');
+            const stepPassword = document.getElementById('stepPassword');
+            const stepDashboard = document.getElementById('stepDashboard');
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const btnEmailNext = document.getElementById('btnEmailNext');
+            const btnPasswordNext = document.getElementById('btnPasswordNext');
+            const btnBackToEmail = document.getElementById('btnBackToEmail');
+            const btnSignOut = document.getElementById('btnSignOut');
+            const displayUserEmail = document.getElementById('displayUserEmail');
+            const avatarLetter = document.getElementById('avatarLetter');
+            const dashAvatar = document.getElementById('dashAvatar');
+            const stepSubtitle = document.getElementById('stepSubtitle');
+
+            // Social Login Buttons
+            const btnSocialGoogle = document.getElementById('btnSocialGoogle');
+            const btnSocialGithub = document.getElementById('btnSocialGithub');
+            const btnSocialX = document.getElementById('btnSocialX');
+
+            // HUD Video & Audio UX
+            const btnToggleVideo = document.getElementById('btnToggleVideo');
+            const btnToggleAudio = document.getElementById('btnToggleAudio');
+            const iconPause = document.getElementById('iconPause');
+            const iconPlay = document.getElementById('iconPlay');
+            const iconMute = document.getElementById('iconMute');
+            const iconSound = document.getElementById('iconSound');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const audioWaveBox = document.getElementById('audioWaveBox');
+            const themePills = document.querySelectorAll('.theme-pill');
+
+            // --- STATE VARIABLES ---
+            let isVideoPlaying = true;
+            let isAudioActive = false;
+            let currentUserEmail = '';
+            let audioCtx = null;
+            let ambientOsc1 = null;
+            let ambientOsc2 = null;
+            let gainNode = null;
+
+            // --- 1. WEB AUDIO API SPATIAL SOUND SYNTHESIZER ---
+            function initWebAudio() {
+                if (audioCtx) return;
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+
+                    // Master Volume Gain
+                    gainNode = audioCtx.createGain();
+                    gainNode.gain.setValueAtTime(parseFloat(volumeSlider.value) * 0.15, audioCtx.currentTime);
+                    gainNode.connect(audioCtx.destination);
+
+                    // Dual Low-Frequency Oscillators for Amazon Forest Drone Ambience
+                    ambientOsc1 = audioCtx.createOscillator();
+                    ambientOsc2 = audioCtx.createOscillator();
+
+                    ambientOsc1.type = 'sine';
+                    ambientOsc1.frequency.setValueAtTime(110, audioCtx.currentTime); // A2
+
+                    ambientOsc2.type = 'triangle';
+                    ambientOsc2.frequency.setValueAtTime(164.81, audioCtx.currentTime); // E3
+
+                    // Filter for lush organic sound
+                    const biquadFilter = audioCtx.createBiquadFilter();
+                    biquadFilter.type = 'lowpass';
+                    biquadFilter.frequency.setValueAtTime(320, audioCtx.currentTime);
+
+                    ambientOsc1.connect(biquadFilter);
+                    ambientOsc2.connect(biquadFilter);
+                    biquadFilter.connect(gainNode);
+
+                    ambientOsc1.start();
+                    ambientOsc2.start();
+                } catch (e) {
+                    console.log('Web Audio setup:', e);
+                }
+            }
+
+            function playSpatialClickSound(freq = 440, type = 'sine') {
+                if (!audioCtx) initWebAudio();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                    noteGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+
+                    osc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } catch (err) {}
+            }
+
+            function showToast(msg) {
+                toastMessage.innerText = msg;
+                spatialToast.classList.add('show');
+                setTimeout(() => {
+                    spatialToast.classList.remove('show');
+                }, 3500);
+            }
+
+            // --- 2. AMAZON FOREST PROCEDURAL CANVAS VISUALIZER ---
+            function setupForestCanvas() {
+                const ctx = forestCanvas.getContext('2d');
+                let width = forestCanvas.width = window.innerWidth;
+                let height = forestCanvas.height = window.innerHeight;
+
+                window.addEventListener('resize', () => {
+                    width = forestCanvas.width = window.innerWidth;
+                    height = forestCanvas.height = window.innerHeight;
+                });
+
+                // Canopy Rays & Foliage Layers
+                let time = 0;
+                function drawForestFrame() {
+                    if (!isVideoPlaying) {
+                        requestAnimationFrame(drawForestFrame);
+                        return;
+                    }
+                    time += 0.01;
+                    ctx.clearRect(0, 0, width, height);
+
+                    // Deep Amazon Gradient Background
+                    const gradient = ctx.createLinearGradient(0, 0, width, height);
+                    gradient.addColorStop(0, '#020c06');
+                    gradient.addColorStop(0.5, '#082114');
+                    gradient.addColorStop(1, '#030a05');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, width, height);
+
+                    // Light Rays through Forest Canopy
+                    for (let i = 0; i < 5; i++) {
+                        ctx.save();
+                        ctx.beginPath();
+                        const rayX = width * (0.15 + i * 0.2) + Math.sin(time + i) * 30;
+                        const rayGradient = ctx.createLinearGradient(rayX, 0, rayX + 150, height);
+                        rayGradient.addColorStop(0, 'rgba(52, 211, 153, 0.12)');
+                        rayGradient.addColorStop(1, 'rgba(52, 211, 153, 0)');
+                        ctx.fillStyle = rayGradient;
+                        ctx.moveTo(rayX, 0);
+                        ctx.lineTo(rayX + 120, 0);
+                        ctx.lineTo(rayX + 300, height);
+                        ctx.lineTo(rayX + 100, height);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                    }
+
+                    // Procedural Silhouette Canopy
+                    ctx.fillStyle = '#010804';
+                    ctx.beginPath();
+                    ctx.moveTo(0, height);
+                    for (let x = 0; x <= width; x += 40) {
+                        const treeHeight = Math.sin(x * 0.005 + time * 0.5) * 50 + 120;
+                        ctx.lineTo(x, height - treeHeight);
+                    }
+                    ctx.lineTo(width, height);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    requestAnimationFrame(drawForestFrame);
+                }
+
+                drawForestFrame();
+            }
+
+            // --- 3. BIOLUMINESCENT FIREFLIES PARTICLES ---
+            function setupFireflies() {
+                const ctx = firefliesCanvas.getContext('2d');
+                let w = firefliesCanvas.width = window.innerWidth;
+                let h = firefliesCanvas.height = window.innerHeight;
+
+                window.addEventListener('resize', () => {
+                    w = firefliesCanvas.width = window.innerWidth;
+                    h = firefliesCanvas.height = window.innerHeight;
+                });
+
+                const fireflies = Array.from({ length: 45 }, () => ({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    size: Math.random() * 2.5 + 1,
+                    speedX: (Math.random() - 0.5) * 0.6,
+                    speedY: (Math.random() - 0.5) * 0.6,
+                    alpha: Math.random(),
+                    alphaSpeed: Math.random() * 0.02 + 0.005,
+                    color: Math.random() > 0.3 ? '#34d399' : '#fbbc05'
+                }));
+
+                function renderFireflies() {
+                    ctx.clearRect(0, 0, w, h);
+
+                    fireflies.forEach(p => {
+                        p.x += p.speedX;
+                        p.y += p.speedY;
+                        p.alpha += p.alphaSpeed;
+
+                        if (p.alpha > 1 || p.alpha < 0) p.alphaSpeed = -p.alphaSpeed;
+                        if (p.x < 0) p.x = w;
+                        if (p.x > w) p.x = 0;
+                        if (p.y < 0) p.y = h;
+                        if (p.y > h) p.y = 0;
+
+                        ctx.save();
+                        ctx.globalAlpha = Math.max(0, p.alpha);
+                        ctx.shadowBlur = 12;
+                        ctx.shadowColor = p.color;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    });
+
+                    requestAnimationFrame(renderFireflies);
+                }
+
+                renderFireflies();
+            }
+
+            // --- 4. VISIONOS 3D SPATIAL PARALLAX TILT ---
+            function setup3DTilt() {
+                let rect = glassCard.getBoundingClientRect();
+
+                window.addEventListener('resize', () => {
+                    rect = glassCard.getBoundingClientRect();
+                });
+
+                viewport.addEventListener('mousemove', (e) => {
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const mouseX = e.clientX - centerX;
+                    const mouseY = e.clientY - centerY;
+
+                    const rotateX = (-mouseY / centerY) * 12; // Max 12deg
+                    const rotateY = (mouseX / centerX) * 12;
+
+                    spatialStage.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    ambientGlow.style.transform = `translate(${mouseX * 0.15}px, ${mouseY * 0.15}px)`;
+                });
+
+                viewport.addEventListener('mouseleave', () => {
+                    spatialStage.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+                });
+            }
+
+            // --- 5. AUTHENTICATION & MULTI-STEP FLOW LOGIC ---
+            function transitionToStep(fromStep, toStep, subtitleText) {
+                fromStep.classList.remove('active');
+                fromStep.classList.add('exit-left');
+
+                setTimeout(() => {
+                    fromStep.classList.remove('exit-left');
+                    toStep.classList.add('active');
+                    if (subtitleText) stepSubtitle.innerText = subtitleText;
+                }, 200);
+            }
+
+            btnEmailNext.addEventListener('click', () => {
+                const email = emailInput.value.trim();
+                if (!email || !email.includes('@')) {
+                    showToast('Please enter a valid email address');
+                    playSpatialClickSound(220, 'sawtooth');
+                    emailInput.focus();
+                    return;
+                }
+
+                currentUserEmail = email;
+                displayUserEmail.innerText = email;
+                avatarLetter.innerText = email.charAt(0).toUpperCase();
+                dashAvatar.innerText = email.charAt(0).toUpperCase();
+
+                playSpatialClickSound(587.33, 'sine');
+                transitionToStep(stepEmail, stepPassword, 'Verify your Spatial Passkey');
+                showToast(`Passkey requested for ${email}`);
+            });
+
+            emailInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') btnEmailNext.click();
+            });
+
+            btnPasswordNext.addEventListener('click', () => {
+                const pwd = passwordInput.value;
+                if (!pwd) {
+                    showToast('Please enter your password or spatial key');
+                    playSpatialClickSound(220, 'sawtooth');
+                    passwordInput.focus();
+                    return;
+                }
+
+                playSpatialClickSound(880, 'sine');
+                transitionToStep(stepPassword, stepDashboard, 'Authenticated Spatial Session');
+                showToast('Welcome to Gmail Spatial OS!');
+            });
+
+            passwordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') btnPasswordNext.click();
+            });
+
+            btnBackToEmail.addEventListener('click', () => {
+                playSpatialClickSound(440, 'sine');
+                transitionToStep(stepPassword, stepEmail, 'Sign in to proceed to Spatial Workspace');
+            });
+
+            btnSignOut.addEventListener('click', () => {
+                playSpatialClickSound(350, 'sine');
+                passwordInput.value = '';
+                transitionToStep(stepDashboard, stepEmail, 'Sign in to proceed to Spatial Workspace');
+                showToast('Signed out of Spatial Node');
+            });
+
+            // Social Sign-In Handlers
+            const handleSocialAuth = (providerName) => {
+                playSpatialClickSound(659.25, 'sine');
+                const dummyEmail = `user.${providerName.toLowerCase().replace(' ', '')}@gmail.com`;
+                emailInput.value = dummyEmail;
+                currentUserEmail = dummyEmail;
+                displayUserEmail.innerText = dummyEmail;
+                avatarLetter.innerText = providerName.charAt(0);
+                dashAvatar.innerText = providerName.charAt(0);
+
+                transitionToStep(stepEmail, stepDashboard, 'Authenticated via ' + providerName);
+                showToast(`Signed in with ${providerName} Spatial Identity`);
+            };
+
+            btnSocialGoogle.addEventListener('click', () => handleSocialAuth('Google'));
+            btnSocialGithub.addEventListener('click', () => handleSocialAuth('GitHub'));
+            btnSocialX.addEventListener('click', () => handleSocialAuth('X OS'));
+
+            // --- 6. VIDEO & AUDIO HUD UI UX CONTROLS ---
+            btnToggleVideo.addEventListener('click', () => {
+                playSpatialClickSound(523.25, 'sine');
+                isVideoPlaying = !isVideoPlaying;
+
+                if (isVideoPlaying) {
+                    iconPause.style.display = 'block';
+                    iconPlay.style.display = 'none';
+                    if (forestVideo) forestVideo.play().catch(() => {});
+                    showToast('Amazon Forest Video Resumed');
+                } else {
+                    iconPause.style.display = 'none';
+                    iconPlay.style.display = 'block';
+                    if (forestVideo) forestVideo.pause();
+                    showToast('Amazon Forest Video Paused');
+                }
+            });
+
+            btnToggleAudio.addEventListener('click', () => {
+                initWebAudio();
+                isAudioActive = !isAudioActive;
+
+                if (isAudioActive) {
+                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                    iconMute.style.display = 'none';
+                    iconSound.style.display = 'block';
+                    audioWaveBox.classList.add('playing');
+                    showToast('Amazon Forest Ambient Audio Active');
+                    playSpatialClickSound(659.25, 'sine');
+                } else {
+                    iconMute.style.display = 'block';
+                    iconSound.style.display = 'none';
+                    audioWaveBox.classList.remove('playing');
+                    showToast('Ambient Audio Muted');
+                }
+            });
+
+            volumeSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (gainNode && audioCtx) {
+                    gainNode.gain.setValueAtTime(val * 0.15, audioCtx.currentTime);
+                }
+            });
+
+            // Theme Selector Pills
+            themePills.forEach(pill => {
+                pill.addEventListener('click', () => {
+                    playSpatialClickSound(493.88, 'sine');
+                    themePills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+
+                    const theme = pill.getAttribute('data-theme');
+                    document.body.setAttribute('data-forest-theme', theme);
+                    showToast(`Forest Mood: ${pill.innerText}`);
+                });
+            });
+
+            // --- INITIALIZATION ---
+            setupForestCanvas();
+            setupFireflies();
+            setup3DTilt();
+
+            // Attempt video playback on load
+            if (forestVideo) {
+                forestVideo.play().catch(() => {
+                    // Autoplay fallback: Canvas visualizer handles animation seamlessly
+                });
+            }
+        });
+    </script>
+</body>
+</html>
