@@ -1,0 +1,662 @@
+/* ==========================================================================
+   DESIGNING/TOW — Premium Download Website Stylesheet
+   Theme: Premium Dark (Black, Deep Navy, Vibrant Orange Accents)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties & Design Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  --color-bg-base: #06080d;
+  --color-bg-navy: #0b111e;
+  --color-bg-navy-light: #121b2d;
+  --color-card-bg: rgba(16, 23, 38, 0.75);
+  --color-card-border: rgba(255, 122, 0, 0.18);
+  --color-card-border-hover: rgba(255, 122, 0, 0.45);
+
+  /* Orange Accent System */
+  --color-orange: #ff7a00;
+  --color-orange-glow: rgba(255, 122, 0, 0.35);
+  --color-orange-hover: #ff9124;
+  --color-orange-dark: #d66400;
+  --color-orange-light: #ffe8cc;
+
+  /* Text & Foreground */
+  --color-text-main: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-text-subtle: #64748b;
+  --color-white: #ffffff;
+
+  /* Dimensions & Spacing */
+  --max-content-width: 1400px;
+  --max-xl-width: 1600px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* Shadows & Glows */
+  --shadow-subtle: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.65);
+  --shadow-orange-glow: 0 0 35px rgba(255, 122, 0, 0.4);
+  --shadow-orange-intense: 0 8px 40px rgba(255, 122, 0, 0.55);
+
+  /* Typography */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --transition-smooth: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Reset & Baseline
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+  font-family: var(--font-family-base);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: radial-gradient(circle at 50% 0%, #0d1629 0%, #06080d 65%);
+}
+
+/* --------------------------------------------------------------------------
+   Background Ambient Glowing Orbs
+   -------------------------------------------------------------------------- */
+.ambient-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: 0;
+  opacity: 0.45;
+}
+
+.glow-top {
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.22) 0%, rgba(13, 22, 41, 0) 70%);
+}
+
+.glow-mid {
+  top: 45%;
+  right: -100px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(14, 34, 68, 0.45) 0%, rgba(6, 8, 13, 0) 70%);
+}
+
+.glow-bottom {
+  bottom: 100px;
+  left: -100px;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.15) 0%, rgba(13, 22, 41, 0) 70%);
+}
+
+/* --------------------------------------------------------------------------
+   1. LOGO SECTION (Exact Website Order #1)
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 3.5rem 1.5rem 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.header-container {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  background: rgba(11, 17, 30, 0.65);
+  border: 1px solid rgba(255, 122, 0, 0.22);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 122, 0, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.logo-wrapper:hover {
+  border-color: rgba(255, 122, 0, 0.55);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 122, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+.brand-logo {
+  display: block;
+  max-width: 420px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+}
+
+/* --------------------------------------------------------------------------
+   Main Page Layout
+   -------------------------------------------------------------------------- */
+.page-main {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   2. FIRST LARGE VIDEO & 3. SECOND EXTRA-LARGE VIDEO
+   -------------------------------------------------------------------------- */
+.video-showcase {
+  width: 100%;
+  padding: 2rem 1.5rem 3.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.video-showcase-first {
+  padding-top: 1rem;
+}
+
+.video-showcase-second {
+  padding-top: 2rem;
+  padding-bottom: 5rem;
+}
+
+.media-container {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.media-container-xl {
+  max-width: var(--max-xl-width);
+}
+
+/* 16:9 Aspect Ratio Container */
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #030407;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated), 0 0 40px rgba(255, 122, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: var(--transition-smooth);
+}
+
+.video-frame:hover {
+  border-color: rgba(255, 122, 0, 0.35);
+  box-shadow: var(--shadow-elevated), 0 0 50px rgba(255, 122, 0, 0.22);
+}
+
+.video-frame-xl {
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 122, 0, 0.18);
+  border: 1px solid rgba(255, 122, 0, 0.25);
+}
+
+.app-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  outline: none;
+  background-color: #000000;
+}
+
+/* Overlay Video Controls */
+.video-overlay-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 5;
+  opacity: 0.75;
+  transition: var(--transition-smooth);
+}
+
+.video-frame:hover .video-overlay-controls {
+  opacity: 1;
+}
+
+.video-action-btn {
+  background: rgba(11, 17, 30, 0.85);
+  border: 1px solid rgba(255, 122, 0, 0.4);
+  color: var(--color-white);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+}
+
+.video-action-btn:hover {
+  background: var(--color-orange);
+  color: var(--color-white);
+  border-color: var(--color-orange);
+  transform: scale(1.1);
+  box-shadow: var(--shadow-orange-glow);
+}
+
+.video-action-btn .icon-play {
+  display: none;
+}
+.video-action-btn .icon-pause {
+  display: block;
+}
+.video-action-btn.paused .icon-play {
+  display: block;
+}
+.video-action-btn.paused .icon-pause {
+  display: none;
+}
+
+.video-action-btn .icon-sound-on {
+  display: none;
+}
+.video-action-btn .icon-sound-off {
+  display: block;
+}
+.video-action-btn.unmuted .icon-sound-on {
+  display: block;
+}
+.video-action-btn.unmuted .icon-sound-off {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   4. FOUR LARGE PHOTOGRAPHS (Vertical stack, 1 per row, generous spacing)
+   -------------------------------------------------------------------------- */
+.photos-gallery {
+  width: 100%;
+  padding: 2rem 1.5rem 6rem;
+}
+
+.photos-container {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5.5rem; /* Generous spacing between photos */
+}
+
+.photo-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.photo-card {
+  width: 100%;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: var(--transition-smooth);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-card:hover {
+  border-color: var(--color-card-border-hover);
+  box-shadow: var(--shadow-elevated), 0 0 40px rgba(255, 122, 0, 0.2);
+  transform: translateY(-4px);
+}
+
+.photo-img {
+  width: 100%;
+  height: auto;
+  max-height: 820px;
+  display: block;
+  object-fit: contain;
+  background-color: #080c14;
+}
+
+/* --------------------------------------------------------------------------
+   5. DOWNLOAD SECTION (Exact Order #5)
+   -------------------------------------------------------------------------- */
+.download-section {
+  width: 100%;
+  padding: 4rem 1.5rem 8rem;
+  display: flex;
+  justify-content: center;
+}
+
+.download-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.download-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(18, 27, 45, 0.95) 0%, rgba(10, 15, 26, 0.95) 100%);
+  border: 2px solid rgba(255, 122, 0, 0.38);
+  border-radius: var(--radius-xl);
+  padding: 4.5rem 3.5rem;
+  box-shadow: var(--shadow-elevated), var(--shadow-orange-glow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  text-align: center;
+  transition: var(--transition-smooth);
+}
+
+.download-card:hover {
+  border-color: rgba(255, 122, 0, 0.65);
+  box-shadow: var(--shadow-elevated), var(--shadow-orange-intense);
+}
+
+.download-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.8rem;
+}
+
+.app-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.2) 0%, rgba(11, 17, 30, 0.8) 80%);
+  border: 1px solid rgba(255, 122, 0, 0.45);
+  border-radius: 22px;
+  box-shadow: 0 0 30px rgba(255, 122, 0, 0.25);
+}
+
+.windows-icon {
+  color: var(--color-orange);
+  filter: drop-shadow(0 2px 8px rgba(255, 122, 0, 0.4));
+}
+
+.badge-tag {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: rgba(255, 122, 0, 0.15);
+  border: 1px solid rgba(255, 122, 0, 0.35);
+  color: var(--color-orange);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 50px;
+  margin-bottom: 0.85rem;
+}
+
+.app-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-white);
+  line-height: 1.15;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.app-tagline {
+  color: var(--color-text-muted);
+  font-size: 1.15rem;
+  max-width: 620px;
+  margin-top: 0.5rem;
+}
+
+/* Metadata Grid */
+.download-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin: 0 auto 3rem;
+  max-width: 720px;
+}
+
+.meta-item {
+  background: rgba(11, 17, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+  transition: var(--transition-smooth);
+}
+
+.meta-item:hover {
+  border-color: rgba(255, 122, 0, 0.3);
+  background: rgba(18, 27, 45, 0.8);
+}
+
+.meta-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-subtle);
+  font-weight: 600;
+}
+
+.meta-val {
+  font-size: 1.05rem;
+  color: var(--color-text-main);
+  font-weight: 600;
+}
+
+/* Large Orange Download Button */
+.download-cta-wrapper {
+  margin-bottom: 2.5rem;
+}
+
+.download-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.4rem 3.5rem;
+  background: linear-gradient(135deg, #ff8c1a 0%, #ff6a00 100%);
+  color: var(--color-white);
+  text-decoration: none;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(255, 122, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: var(--transition-smooth);
+  cursor: pointer;
+}
+
+.download-btn-primary:hover {
+  background: linear-gradient(135deg, #ffa033 0%, #ff7a00 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-orange-intense);
+}
+
+.download-btn-primary:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.35);
+}
+
+.download-icon {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.download-btn-primary:hover .download-icon {
+  transform: translateY(3px);
+}
+
+.btn-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.btn-heading {
+  font-size: 1.4rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.btn-subtext {
+  font-size: 0.88rem;
+  font-weight: 500;
+  opacity: 0.92;
+}
+
+/* Compatibility & Security Note */
+.compatibility-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.compatibility-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #38bdf8;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.compatibility-note {
+  color: var(--color-text-subtle);
+  font-size: 0.85rem;
+  max-width: 540px;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.site-footer {
+  width: 100%;
+  padding: 3rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(6, 8, 13, 0.9);
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.footer-container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.copyright {
+  color: var(--color-text-subtle);
+  font-size: 0.9rem;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Breakpoints
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .photos-container {
+    gap: 4rem;
+  }
+
+  .download-card {
+    padding: 3.5rem 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    padding: 2.5rem 1rem 1.5rem;
+  }
+
+  .brand-logo {
+    max-width: 290px;
+  }
+
+  .video-showcase {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .photos-gallery {
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .photos-container {
+    gap: 3rem;
+  }
+
+  .download-section {
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  .download-card {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .app-title {
+    font-size: 2.4rem;
+  }
+
+  .download-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .download-btn-primary {
+    padding: 1.15rem 2rem;
+    width: 100%;
+  }
+
+  .btn-heading {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .logo-wrapper {
+    padding: 0.8rem 1.2rem;
+  }
+}

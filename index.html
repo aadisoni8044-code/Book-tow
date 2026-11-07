@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Designing/tow — Professional Windows Desktop Application</title>
+  <meta name="description" content="Designing/tow is a premium, high-performance desktop application for Windows. Download Designing/tow for Windows 10 and Windows 11.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/a.png">
+</head>
+<body>
+
+  <!-- Background Ambience -->
+  <div class="ambient-glow glow-top" aria-hidden="true"></div>
+  <div class="ambient-glow glow-mid" aria-hidden="true"></div>
+  <div class="ambient-glow glow-bottom" aria-hidden="true"></div>
+
+  <!-- EXACT ORDER SECTION 1: LOGO -->
+  <header class="site-header" id="top">
+    <div class="header-container">
+      <div class="logo-wrapper">
+        <img src="assets/a.png" alt="Designing/tow Application Logo" class="brand-logo" width="360" height="auto">
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+
+    <!-- EXACT ORDER SECTION 2: FIRST LARGE VIDEO (assets/a.mp4) -->
+    <section class="video-showcase video-showcase-first" id="showcase-1" aria-label="Designing/tow Workspace Demonstration">
+      <div class="media-container">
+        <div class="video-frame">
+          <video
+            class="app-video"
+            id="video-player-a"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="Designing/tow Workspace Demo Video">
+            <source src="assets/a.mp4" type="video/mp4">
+            <p>Your browser does not support HTML5 video playback. Please upgrade to a modern browser.</p>
+          </video>
+          <div class="video-overlay-controls" data-video="video-player-a">
+            <button class="video-action-btn pause-toggle" aria-label="Pause or Play video" title="Toggle Play / Pause">
+              <svg class="icon-play" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="video-action-btn sound-toggle" aria-label="Toggle video audio" title="Toggle Mute">
+              <svg class="icon-sound-off" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27l4.73 4.73H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              <svg class="icon-sound-on" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXACT ORDER SECTION 3: SECOND EXTRA-LARGE VIDEO (assets/b.mp4) -->
+    <section class="video-showcase video-showcase-second" id="showcase-2" aria-label="Designing/tow High-Performance Demonstration">
+      <div class="media-container media-container-xl">
+        <div class="video-frame video-frame-xl">
+          <video
+            class="app-video"
+            id="video-player-b"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="Designing/tow Extra-Large Feature Demo Video">
+            <source src="assets/b.mp4" type="video/mp4">
+            <p>Your browser does not support HTML5 video playback. Please upgrade to a modern browser.</p>
+          </video>
+          <div class="video-overlay-controls" data-video="video-player-b">
+            <button class="video-action-btn pause-toggle" aria-label="Pause or Play video" title="Toggle Play / Pause">
+              <svg class="icon-play" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="video-action-btn sound-toggle" aria-label="Toggle video audio" title="Toggle Mute">
+              <svg class="icon-sound-off" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27l4.73 4.73H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+              <svg class="icon-sound-on" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXACT ORDER SECTION 4: FOUR LARGE PHOTOGRAPHS (ONE PHOTO PER ROW) -->
+    <section class="photos-gallery" aria-label="Designing/tow Interface Screenshots">
+      <div class="photos-container">
+
+        <!-- Photo 1: assets/b.png -->
+        <article class="photo-row">
+          <div class="photo-card">
+            <img src="assets/b.png" alt="Designing/tow Interface Overview" class="photo-img" loading="lazy">
+          </div>
+        </article>
+
+        <!-- Photo 2: assets/c.png -->
+        <article class="photo-row">
+          <div class="photo-card">
+            <img src="assets/c.png" alt="Designing/tow Performance and Analytics" class="photo-img" loading="lazy">
+          </div>
+        </article>
+
+        <!-- Photo 3: assets/d.png -->
+        <article class="photo-row">
+          <div class="photo-card">
+            <img src="assets/d.png" alt="Designing/tow Advanced Capabilities and Workspace" class="photo-img" loading="lazy">
+          </div>
+        </article>
+
+        <!-- Photo 4: assets/e.png -->
+        <article class="photo-row">
+          <div class="photo-card">
+            <img src="assets/e.png" alt="Designing/tow Export and Package Delivery" class="photo-img" loading="lazy">
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- EXACT ORDER SECTION 5: DOWNLOAD SECTION -->
+    <section class="download-section" id="download" aria-label="Download Designing/tow">
+      <div class="download-container">
+        <div class="download-card">
+
+          <div class="download-header">
+            <div class="app-icon-wrapper" aria-hidden="true">
+              <!-- Windows Application Icon -->
+              <svg class="windows-icon" viewBox="0 0 88 88" width="56" height="56" fill="currentColor">
+                <path d="M0 12.402l35.689-4.86v33.407H0V12.402zm0 37.603h35.689v33.407L0 78.552V50.005zm40.548-43.149L88 0v40.949H40.548V6.856zm47.452 43.149V88l-47.452-6.527V50.005H88z"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <span class="badge-tag">OFFICIAL WINDOWS RELEASE</span>
+              <h1 class="app-title">Designing/tow</h1>
+              <p class="app-tagline">High-Performance Professional Desktop Software for Windows</p>
+            </div>
+          </div>
+
+          <div class="download-meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">Version</span>
+              <span class="meta-val">v1.0.0 Stable</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">File Size</span>
+              <span class="meta-val">64.2 MB</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Operating System</span>
+              <span class="meta-val">Windows 11 / Windows 10 (64-bit)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Package Format</span>
+              <span class="meta-val">ZIP Package (.zip) / Standalone</span>
+            </div>
+          </div>
+
+          <!-- Large Orange Download Button -->
+          <div class="download-cta-wrapper">
+            <a href="downloads/DesigningTow-Setup.zip" download="DesigningTow-Setup.zip" class="download-btn-primary" id="main-download-button">
+              <!-- Download Icon -->
+              <svg class="download-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span class="btn-text">
+                <span class="btn-heading">Download for Windows</span>
+                <span class="btn-subtext">Direct Installer &bull; DesigningTow-Setup.zip</span>
+              </span>
+            </a>
+          </div>
+
+          <div class="compatibility-info">
+            <div class="compatibility-badge">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Fully compatible with Windows 11 and Windows 10 (x64)</span>
+            </div>
+            <p class="compatibility-note">
+              No additional runtime installation required. Verified virus-free and malware-free standalone build.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-container">
+      <p class="copyright">&copy; 2026 Designing/tow. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
